@@ -44,8 +44,10 @@ local function tryHPlacement()
 		local placement = true
 		for i=1,#words[counter] do
 			
-			if(matrix[curColumn][curRow]~=0 and matrix[curColumn][curRow]~=words[counter]:sub(i,i))then
-				placement = false
+			if(matrix[curColumn][curRow]~=words[counter]:sub(i,i))then
+				if(matrix[curColumn][curRow]~=0)then
+					placement = false
+				end
 			end
 
 			
@@ -54,8 +56,10 @@ local function tryHPlacement()
 		if(placement)then
 			for i=1,#words[counter] do
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
+				
 				curRow=curRow+1
 			end
+			
 			counter=counter+1
 		end
 	else
@@ -72,8 +76,10 @@ local function tryVPlacement()
 		local placement = true
 		for i=1,#words[counter] do
 			
-			if(matrix[curColumn][curRow]~=0 and matrix[curColumn][curRow]~=words[counter]:sub(i,i))then
-				placement = false
+			if(matrix[curColumn][curRow]~=words[counter]:sub(i,i))then
+				if(matrix[curColumn][curRow]~=0)then
+					placement = false
+				end
 			end
 			
 			--myText:setFillColor( 1, 0, 0 )
@@ -82,7 +88,9 @@ local function tryVPlacement()
 		if(placement)then
 			for i=1,#words[counter] do
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
+				
 				curColumn=curColumn+1
+				
 			end
 			counter=counter+1
 		end
@@ -145,7 +153,7 @@ function scene:show( event )
 	   local str="aaaabbbbbcddddeeeefgggghhhhiiiiijkkkkllllmmmmnnnnoooooppppqrrrrssstttttuuvvvwwwxyyyz"
 	   local checkLetter
 	   
-	   print()
+	   --print()
 	   for c = 1,columns do
 			for r = 1,rows do
 			if(matrix[c][r]==0)then
@@ -153,6 +161,8 @@ function scene:show( event )
 				if(checkLetter~=nil)then
 					while(randomL=="s" or randomL=="a" or randomL=="e" or randomL=="i" or randomL=="o" or randomL=="u")do
 						randomL = string.char(str:byte(math.random(1, #str)))
+						--print ("x: "..c.." y: "..r)
+						--print (randomL)
 					end
 				end
 				if(randomL == "v")then
@@ -171,7 +181,7 @@ function scene:show( event )
 				matrix[c][r] = randomL
 			end
 			local smallRect = display.newRect(0,0,18,18)
-			smallRect.alpha=0.5
+			smallRect.alpha=0
 			--smallRect:setFillColor(0.5)
 			smallRect.anchorX =0
 			smallRect.anchorY =0
