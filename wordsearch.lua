@@ -12,6 +12,7 @@ local gr3 = require("g3")
 local scene = composer.newScene( sceneName )
 
 ---------------------------------------------------------------------------------
+local isTouched = false
 local counter = 1
 local rows = 10
 local curRow = 1
@@ -136,6 +137,7 @@ function myTouchListener( event )
 		
 	 if ( event.phase == "began" ) then
         -- Code executed when the button is touched
+		 isTouched = true
 		 iX = event.target.x +12/2
 		 iY = event.target.y + 12
 		
@@ -174,6 +176,7 @@ function myTouchListener( event )
         --print( "object touched = "..tostring(event.target) )  -- 'event.target' is the touched object
     elseif ( event.phase == "moved" ) then
         -- Code executed when the touch is moved over the object
+		if(isTouched)then
 		line:removeSelf()
 		line= nil
 		--l:removeSelf()
@@ -206,74 +209,78 @@ function myTouchListener( event )
 		linegrid:insert(circle1)
 		linegrid:insert(line)
        -- print( "touch location in content coordinates = "..event.x..","..event.y )
+	   end
     elseif ( event.phase == "ended" ) then
         -- Code executed when the touch lifts off the object
-		if correctmask[event.target.c][event.target.r]==correct then
-			--correct = true
-		else
-			correct = false
-		end
-		line:removeSelf()
-		line= nil
-		if(circle1 ~=nil)then
-			circle1:removeSelf()
-			circle1=nil
-		end
-		-- l:removeSelf()
-		-- l= nil
-		-- if(c1 ~=nil)then
-			-- c1:removeSelf()
-			-- c1=nil
-		-- end
-		circle2 = display.newCircle(event.target.x+12/2,event.target.y+12,10)
-		circle2:setFillColor(color[1],color[2],color[3] )
-		line = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
-		line.anchorX =0
-		line.anchorY =0
-		line:setStrokeColor( color[1],color[2],color[3] )
-		line.strokeWidth = 20
-		
-		-- c2 = display.newCircle(event.target.x+12/2,event.target.y+12,11)
-		-- c2:setFillColor( 0 )
-		-- l = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
-		-- l.anchorX =0
-		-- l.anchorY =0
-		-- l:setStrokeColor( 0 )
-		-- l.strokeWidth = 22
-		--linegrid:insert(c2)
-		--linegrid:insert(l)
-		linegrid:insert(circle2)
-		linegrid:insert(line)
-		if(correct)then
-			print(correct)
-		else
-			if(circle ~=nil)then
-			circle:removeSelf()
-			circle=nil
+		if(isTouched)then
+			if correctmask[event.target.c][event.target.r]==correct then
+				--correct = true
+			else
+				correct = false
 			end
-			if(line ~=nil)then
 			line:removeSelf()
-			line=nil
+			line= nil
+			if(circle1 ~=nil)then
+				circle1:removeSelf()
+				circle1=nil
 			end
-			if(circle2 ~=nil)then
-			circle2:removeSelf()
-			circle2=nil
-			end
-			-- if(c ~=nil)then
-			-- c:removeSelf()
-			-- c=nil
-			-- end
-			-- if(l ~=nil)then
 			-- l:removeSelf()
-			-- l=nil
+			-- l= nil
+			-- if(c1 ~=nil)then
+				-- c1:removeSelf()
+				-- c1=nil
 			-- end
-			-- if(c2 ~=nil)then
-			-- c2:removeSelf()
-			-- c2=nil
-			-- end
-		end
-       -- print( "touch ended on object "..tostring(event.target) )
-    end
+			circle2 = display.newCircle(event.target.x+12/2,event.target.y+12,10)
+			circle2:setFillColor(color[1],color[2],color[3] )
+			line = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
+			line.anchorX =0
+			line.anchorY =0
+			line:setStrokeColor( color[1],color[2],color[3] )
+			line.strokeWidth = 20
+			
+			-- c2 = display.newCircle(event.target.x+12/2,event.target.y+12,11)
+			-- c2:setFillColor( 0 )
+			-- l = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
+			-- l.anchorX =0
+			-- l.anchorY =0
+			-- l:setStrokeColor( 0 )
+			-- l.strokeWidth = 22
+			--linegrid:insert(c2)
+			--linegrid:insert(l)
+			linegrid:insert(circle2)
+			linegrid:insert(line)
+			if(correct)then
+				print(correct)
+			else
+				if(circle ~=nil)then
+				circle:removeSelf()
+				circle=nil
+				end
+				if(line ~=nil)then
+				line:removeSelf()
+				line=nil
+				end
+				if(circle2 ~=nil)then
+				circle2:removeSelf()
+				circle2=nil
+				end
+				-- if(c ~=nil)then
+				-- c:removeSelf()
+				-- c=nil
+				-- end
+				-- if(l ~=nil)then
+				-- l:removeSelf()
+				-- l=nil
+				-- end
+				-- if(c2 ~=nil)then
+				-- c2:removeSelf()
+				-- c2=nil
+				-- end
+			end
+			isTouched = false
+		   -- print( "touch ended on object "..tostring(event.target) )
+		   end
+	end
     return true  -- Prevents touch propagation to underlying objects
     
 end
