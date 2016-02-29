@@ -13,12 +13,34 @@ local scene = composer.newScene( sceneName )
 
 ---------------------------------------------------------------------------------
 local counter = 1
-local rows = 5
+local rows = 10
 local curRow = 1
-local columns = 5
+local columns = 10
 local curColumn = 1
-local swearwordfilter ={"vok","fok","poes","kak","doos","kont","fuck","cunt","dick","ass"}
-local words ={"een","twee","drie","vier","vyf"}
+local colors ={{51/255, 204/255, 51/255},
+{0/255, 153/255, 255/255},
+{255/255, 153/255, 51/255},
+{255/255, 255/255, 51/255},
+{204/255, 102/255, 255/255}
+}
+local xInset = display.contentWidth/20
+local yInset = display.contentHeight/20
+local words ={}
+for i=1,5 do
+	r = math.random(300)
+	local word = gr3.getWord(r)
+	while(string.len(word)>9) do
+		r = math.random(300)
+		word = gr3.getWord(r)
+	end
+	word = string.gsub( word, "%-","")
+	word = string.lower( word )
+	words[i]=word
+	print(word)
+	
+	
+end
+
 local matrix ={}
 local correctmask ={}
 for c=1,columns do
@@ -59,7 +81,9 @@ local function tryHPlacement()
 			for i=1,#words[counter] do
 			
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
-				correctmask[curColumn][curRow] = 1
+				if(i==1 or i==#words[counter])then
+				correctmask[curColumn][curRow] = counter
+				end
 				curRow=curRow+1
 			end
 			counter=counter+1
@@ -90,7 +114,9 @@ local function tryVPlacement()
 		if(placement)then
 			for i=1,#words[counter] do
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
-				correctmask[curColumn][curRow] = 1
+				if(i==1 or i==#words[counter])then
+					correctmask[curColumn][curRow] = counter
+				end
 				curColumn=curColumn+1
 			end
 			counter=counter+1
@@ -117,67 +143,72 @@ function myTouchListener( event )
 		circle = display.newCircle(iX, iY ,10)
 		--circle.x =iX
 		--circle.y =iY
-		circle:setFillColor( 1, 0, 0, 1 )
-		c =display.newCircle(iX, iY ,11)
-		c:setFillColor(0)
+		if(r>4 or r == nil) then
+			r = 1
+		else
+			r=r+1
+		end
+		color =unpack(colors,r)
+		circle:setFillColor( color[1],color[2],color[3] )
+		-- c =display.newCircle(iX, iY ,10.5)
+		-- c:setFillColor(0)
 		line = display.newLine( iX, iY, iX, iY )
 		line.anchorX =0
 		line.anchorY =0
-		line:setStrokeColor( 1, 0, 0, 1 )
+		line:setStrokeColor( color[1],color[2],color[3] )
 		line.strokeWidth = 20
-		l = display.newLine( iX, iY, iX, iY )
-		l.anchorX =0
-		l.anchorY =0
-		l:setStrokeColor(  0 )
-		l.strokeWidth = 22
+		-- l = display.newLine( iX, iY, iX, iY )
+		-- l.anchorX =0
+		-- l.anchorY =0
+		-- l:setStrokeColor(  0 )
+		-- l.strokeWidth = 21
 		
-		linegrid:insert(c)
-		linegrid:insert(l)
+		--linegrid:insert(c)
+		--linegrid:insert(l)
 		linegrid:insert(circle)
 		linegrid:insert(line)
-		if correctmask[event.target.c][event.target.r]==1 then
-			correct = true
-		else
-			correct = false
+		
+		if correctmask[event.target.c][event.target.r]~=0 then
+			correct = correctmask[event.target.c][event.target.r]
 		end
         --print( "object touched = "..tostring(event.target) )  -- 'event.target' is the touched object
     elseif ( event.phase == "moved" ) then
         -- Code executed when the touch is moved over the object
 		line:removeSelf()
 		line= nil
-		l:removeSelf()
+		--l:removeSelf()
 		l= nil
 		if(circle1 ~=nil)then
 			circle1:removeSelf()
 			circle1=nil
 		end
-		if(c1 ~=nil)then
-			c1:removeSelf()
-			c1=nil
-		end
-		circle1 = display.newCircle(event.x,event.y,10)
-		circle1:setFillColor( 1, 0, 0, 1 )
-		line = display.newLine( iX, iY, event.x, event.y )
+		-- if(c1 ~=nil)then
+			-- c1:removeSelf()
+			-- c1=nil
+		-- end
+		circle1 = display.newCircle(event.x-xInset,event.y-10,10)
+		circle1:setFillColor( color[1],color[2],color[3])
+		line = display.newLine( iX, iY, event.x-xInset, event.y-10 )
 		line.anchorX =0
 		line.anchorY =0
-		line:setStrokeColor( 1, 0, 0, 1 )
+		line:setStrokeColor( color[1],color[2],color[3])
 		line.strokeWidth = 20
 		
-		c1 = display.newCircle(event.x,event.y,11)
-		c1:setFillColor( 0 )
-		l = display.newLine( iX, iY, event.x, event.y )
-		l.anchorX =0
-		l.anchorY =0
-		l:setStrokeColor(  0 )
-		l.strokeWidth = 22
-		linegrid:insert(c1)
-		linegrid:insert(l)
+		-- c1 = display.newCircle(event.x,event.y-10,11)
+		-- c1:setFillColor( 0 )
+		-- l = display.newLine( iX, iY, event.x, event.y -10 )
+		-- l.anchorX =0
+		-- l.anchorY =0
+		-- l:setStrokeColor(  0 )
+		-- l.strokeWidth = 22
+		--linegrid:insert(c1)
+		--linegrid:insert(l)
 		linegrid:insert(circle1)
 		linegrid:insert(line)
        -- print( "touch location in content coordinates = "..event.x..","..event.y )
     elseif ( event.phase == "ended" ) then
         -- Code executed when the touch lifts off the object
-		if correctmask[event.target.c][event.target.r]==1 then
+		if correctmask[event.target.c][event.target.r]==correct then
 			--correct = true
 		else
 			correct = false
@@ -188,32 +219,33 @@ function myTouchListener( event )
 			circle1:removeSelf()
 			circle1=nil
 		end
-		l:removeSelf()
-		l= nil
-		if(c1 ~=nil)then
-			c1:removeSelf()
-			c1=nil
-		end
+		-- l:removeSelf()
+		-- l= nil
+		-- if(c1 ~=nil)then
+			-- c1:removeSelf()
+			-- c1=nil
+		-- end
 		circle2 = display.newCircle(event.target.x+12/2,event.target.y+12,10)
-		circle2:setFillColor( 1, 0, 0, 1 )
+		circle2:setFillColor(color[1],color[2],color[3] )
 		line = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
 		line.anchorX =0
 		line.anchorY =0
-		line:setStrokeColor( 1, 0, 0, 1 )
+		line:setStrokeColor( color[1],color[2],color[3] )
 		line.strokeWidth = 20
 		
-		c2 = display.newCircle(event.target.x+12/2,event.target.y+12,11)
-		c2:setFillColor( 0 )
-		l = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
-		l.anchorX =0
-		l.anchorY =0
-		l:setStrokeColor( 0 )
-		l.strokeWidth = 22
-		linegrid:insert(c2)
-		linegrid:insert(l)
+		-- c2 = display.newCircle(event.target.x+12/2,event.target.y+12,11)
+		-- c2:setFillColor( 0 )
+		-- l = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
+		-- l.anchorX =0
+		-- l.anchorY =0
+		-- l:setStrokeColor( 0 )
+		-- l.strokeWidth = 22
+		--linegrid:insert(c2)
+		--linegrid:insert(l)
 		linegrid:insert(circle2)
 		linegrid:insert(line)
 		if(correct)then
+			print(correct)
 		else
 			if(circle ~=nil)then
 			circle:removeSelf()
@@ -227,18 +259,18 @@ function myTouchListener( event )
 			circle2:removeSelf()
 			circle2=nil
 			end
-			if(c ~=nil)then
-			c:removeSelf()
-			c=nil
-			end
-			if(l ~=nil)then
-			l:removeSelf()
-			l=nil
-			end
-			if(c2 ~=nil)then
-			c2:removeSelf()
-			c2=nil
-			end
+			-- if(c ~=nil)then
+			-- c:removeSelf()
+			-- c=nil
+			-- end
+			-- if(l ~=nil)then
+			-- l:removeSelf()
+			-- l=nil
+			-- end
+			-- if(c2 ~=nil)then
+			-- c2:removeSelf()
+			-- c2=nil
+			-- end
 		end
        -- print( "touch ended on object "..tostring(event.target) )
     end
@@ -268,13 +300,14 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-       local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
+       local bg = display.newImage("background.png")
 	   bg.anchorX =0
 	   bg.anchorY =0
 	   bg:setFillColor(1)
 	   sceneGroup:insert(bg)
-	   --linegrid.x = 18
-	   --linegrid.y = 18
+	  
+	   linegrid.y = yInset
+	   linegrid.x = xInset
 	   sceneGroup:insert(linegrid)
 	   while(counter~=#words +1)do
 		   if(math.random()>0.1)then
@@ -319,7 +352,7 @@ function scene:show( event )
 				end
 				matrix[c][r] = randomL
 			end
-			local smallRect = display.newRect(0,0,20,20)
+			local smallRect = display.newRect(0,0,25,25)
 			smallRect.alpha=0
 			--smallRect:setFillColor(0)
 			smallRect.anchorX =0
@@ -330,6 +363,7 @@ function scene:show( event )
 			smallRect.r =r
 			smallRect.isHitTestable = true
 			smallRect:addEventListener( "touch", myTouchListener )
+			wordgrid:insert(smallRect)
 			local options = 
 			{
 				--parent = textGroup,
@@ -349,10 +383,34 @@ function scene:show( event )
 			myText.y = r*25
 			myText:setFillColor( 0, 0, 0 )
 			wordgrid:insert(myText)
-			end
 			
+			end
+			for w=1,#words do
+				local options = 
+				{
+					--parent = textGroup,
+					text = words[w],     
+					--x = 0,
+					--y = 200,
+					--width = 128,     --required for multi-line and alignment
+					font = native.systemFontBold,   
+					fontSize = 20,
+					align = "right"  --new alignment parameter
+				}
+
+				local myText = display.newText( options )
+				myText.anchorX =0
+				myText.anchorY =0
+				myText.x = display.contentWidth - xInset*3
+				myText.y = yInset*w*2 + yInset*2
+				myText:setFillColor( 0, 0, 0 )
+				sceneGroup:insert(myText)
+			end
 	   end
+	   wordgrid.y = yInset
+	   wordgrid.x = xInset
 	   sceneGroup:insert(wordgrid)
+	   
     end 
 end
 
