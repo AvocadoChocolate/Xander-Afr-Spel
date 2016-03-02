@@ -11,7 +11,7 @@ display.setStatusBar( display.HiddenStatusBar )
 local composer = require "composer"
 
 -- load scene1
-composer.gotoScene( "spel" )
+composer.gotoScene( "wordsearch" )
 
 -- Add any objects that should appear on all scenes below (e.g. tab bar, hud, etc)
 

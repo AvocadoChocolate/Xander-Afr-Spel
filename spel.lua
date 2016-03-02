@@ -28,11 +28,13 @@ local function getNextWord()
 			end
 		end
 	end
+	word = string.gsub( word, "%-","")
+	word = string.lower( word )
 	return word
 end
 --Developer mode
 local function developerMode()
-	local options = 
+		local options = 
 		{
 			--parent = textGroup,
 			text = word,     
@@ -88,7 +90,19 @@ local function drawLines()
 		myText.pos = i
 		tospell[i] = myText
 		linesGroup:insert(tospell[i])
+		
 	end
+end
+local function Next()
+	word = getNextWord()
+	myText.text = word
+	wordTyped = ""
+	tospell = {}
+	linesGroup:removeSelf()
+	linesGroup = nil
+	linesGroup = display.newGroup()
+	drawLines()
+	counter = 1
 end
 function scene:create( event )
 		sceneGroup = self.view
@@ -113,14 +127,15 @@ function scene:create( event )
         --create a listener function that receives the events of the keyboard
         local listener = function(event)
             if(event.phase == "ended")  then
-				if(event.key == "del")then
-					if(counter>1)then
-						counter = counter - 1
-						tospell[counter].text =""
-						wordTyped = wordTyped:sub(1,string.len(wordTyped)-1)
-					end
-				else
+				
 					if(counter <= string.len(word))then
+						if(event.key == "del")then
+							if(counter>1)then
+								counter = counter - 1
+								tospell[counter].text =""
+								wordTyped = wordTyped:sub(1,string.len(wordTyped)-1)
+							end
+						else
 						tospell[counter].text=keyboard:getText() --update the textfield with the current text of the keyboard
 						wordTyped = wordTyped .. tospell[counter].text
 						--Check correct
@@ -134,30 +149,38 @@ function scene:create( event )
 									prevWords = {}
 									prevWords[#prevWords + 1] = word
 								end
-								word = getNextWord()
-								myText.text = word
-								wordTyped = ""
-								tospell = {}
-								linesGroup:removeSelf()
-								linesGroup = nil
-								linesGroup = display.newGroup()
+								timer.performWithDelay( 500, function() 
+								Next() 
 								sceneGroup:insert(linesGroup)
-								drawLines()
-								counter = 0
+								end)
+								
+								
+								
 							else
 							--show correct go to next word after pause
+								for i=1,#tospell do
+									local letter = word:sub(i,i)
+									if(letter ~= tospell[i].text)then
+										tospell[i].text = letter
+										tospell[i]:setFillColor( 1, 0, 0 )
+									end
+								end
+								timer.performWithDelay( 500, function() 
+								Next() 
+								sceneGroup:insert(linesGroup)
+								end)
 							end
 						end
 						counter = counter + 1
 						
 						
-						
+						end
 					else
 					
 					
 					--Insert pop up xander that says the word does not have so many letters
 					end
-				end
+				
                 --check whether the user finished writing with the keyboard. The inputCompleted
                 --flag of  the keyboard is set to true when the user touched its "OK" button
                 if(event.target.inputCompleted == true) then
