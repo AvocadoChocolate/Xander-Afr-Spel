@@ -300,6 +300,14 @@ function onScreenKeyboard:new(params)
     self.displayGroup = display.newGroup()
  end
 
+ function object:displayOnly(letters)
+		if(type(letters) == "table") then
+            self.enableOnly = letters
+			print("param ENABLEONLY is table")
+        else
+            print("param ENABLEONLY is wrong")
+        end
+ end
 
  --[[
     Setter for the user listener that is notified when the user touches a key
@@ -337,25 +345,41 @@ function onScreenKeyboard:new(params)
   ]]--
  function object:createButton(sign, width, height)
    local buttonGroup = display.newGroup()
+	 --animation that will be shown, when the user touches a key button
+   local touchAnimation = function(event)
+                            local btnGroup = event.target
 
-   local backGround = display.newRect(0,0,width,height)
+                            if(event.phase == "began")then
+                                if(self.btnBgAlpha <= 0.5) then
+                                    btnGroup.alpha = 1
+                                else
+                                    btnGroup.alpha = 0
+                                end
+                                transition.to(btnGroup, {alpha=self.btnBgAlpha, time=250})
+                            end
+                            return false
+                          end
+   local backGround = display.newRoundedRect(0,0,width,height,3)
    
    --backGround:setAnchorPoint(display.TopLeftReferencePoint)
    backGround.anchorX = 0
    backGround.anchorY = 0
    local eo = self.enableOnly
-
+   backGround:setFillColor(0.8)
+   buttonGroup:insert(backGround)
+   --buttonGroup.alpha = 0
    if eo ~= nil then
    		for letters = 1, #eo do
   			if (sign:upper() == eo[letters]:upper()) then
-  			backGround:setFillColor(0,0,0)
+				backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
+				
+				buttonGroup:addEventListener("touch", touchAnimation)
+				--buttonGroup.alpha = 1
   			end
-	end
-   else
-   backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
+		end
    end
    --backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
-   buttonGroup:insert(backGround)
+   
 
    local btnText = display.newText(sign, 0, 0, native.systemFont, height/3)
    btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
@@ -371,23 +395,10 @@ function onScreenKeyboard:new(params)
     btnText.size= btnText.size-1
    end
 
-   --animation that will be shown, when the user touches a key button
-   local touchAnimation = function(event)
-                            local btnGroup = event.target
+  
 
-                            if(event.phase == "began")then
-                                if(self.btnBgAlpha <= 0.5) then
-                                    btnGroup.alpha = 1
-                                else
-                                    btnGroup.alpha = 0
-                                end
-                                transition.to(btnGroup, {alpha=self.btnBgAlpha, time=250})
-                            end
-                            return false
-                          end
-
-   buttonGroup.alpha = self.btnBgAlpha
-   buttonGroup:addEventListener("touch", touchAnimation)
+   --buttonGroup.alpha = self.btnBgAlpha
+   
    buttonGroup.anchorX = 0
    buttonGroup.anchorY = 1
    --buttonGroup:setReferencePoint(display.topLeftReferencePoint)
@@ -495,7 +506,17 @@ function onScreenKeyboard:new(params)
            self.displayGroup:insert(btnGroup)
 
            --call the user defined listener for the key touch events
-           btnGroup:addEventListener("touch", self.userListenerCaller)
+		   local eo = self.enableOnly
+		   if eo ~= nil then
+				for letters = 1, #eo do
+					
+					if (currentItem:upper() == eo[letters]:upper()) then
+						
+						btnGroup:addEventListener("touch", self.userListenerCaller)
+					end
+				end
+		   end
+           
 
            buttonsOfRow = buttonsOfRow+1
        else

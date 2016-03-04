@@ -7,13 +7,16 @@ local myText
 local textField
 local tospell = {}
 local counter = 1
+local Correctioncounter = 1
 local sceneGroup
 local screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
-local word = "ontvang"
+
 local linesGroup = display.newGroup()
 local wordTyped = ""
 local prevWords = {}
+local correction = false
+local correctionTable = {}
 local function getNextWord()
 	local r 
 	local word 
@@ -32,6 +35,7 @@ local function getNextWord()
 	word = string.lower( word )
 	return word
 end
+local word = getNextWord()
 --Developer mode
 local function developerMode()
 		local options = 
@@ -93,41 +97,57 @@ local function drawLines()
 		
 	end
 end
-local function Next()
-	word = getNextWord()
-	myText.text = word
-	wordTyped = ""
-	tospell = {}
-	linesGroup:removeSelf()
-	linesGroup = nil
-	linesGroup = display.newGroup()
-	drawLines()
-	counter = 1
-end
-function scene:create( event )
-		sceneGroup = self.view
-		local bg = display.newImage("background.png")
-		bg.anchorX =0
-		bg.anchorY =0
-		bg:setFillColor(1)
-		sceneGroup:insert(bg)
-		developerMode()
-        --create a textfield for the content created with the keyoard
-        --textField = display.newText("",  xInset * 10, yInset * 5, native.systemFont, 50)
-		
-        --textField:setTextColor(0,0,0)
-        --sceneGroup:insert(textField)
-		
-        keyboard = onScreenKeyboard:new()
-		
-		drawLines()
+local function redrawKeyboard()
+		if(keyboard~=nil)then
+			keyboard:destroy()
+		end
 		
 		
-		sceneGroup:insert(linesGroup)
+		keyboard = onScreenKeyboard:new()
+		
         --create a listener function that receives the events of the keyboard
         local listener = function(event)
             if(event.phase == "ended")  then
-				
+					if(correction)then
+						if(Correctioncounter<=#correctionTable)then
+							local text = keyboard:getText()
+							print(correctionTable[Correctioncounter].text)
+							print(correctionTable[Correctioncounter].pos)
+							if(correctionTable[Correctioncounter].text == text)then
+								tospell[correctionTable[Correctioncounter].pos].text = text
+								Correctioncounter=Correctioncounter+1
+								
+							end
+							if(Correctioncounter>#correctionTable) then
+								--Get next word
+								print("correct")
+								if(#prevWords < 5) then
+									prevWords[#prevWords + 1] = word
+								else
+									prevWords = {}
+									prevWords[#prevWords + 1] = word
+								end
+								timer.performWithDelay( 3000, function() 
+								word = getNextWord()
+								myText.text = word
+								wordTyped = ""
+								tospell = {}
+								linesGroup:removeSelf()
+								linesGroup = nil
+								linesGroup = display.newGroup()
+								redrawKeyboard()
+								drawLines()
+								counter = 1
+								sceneGroup:insert(linesGroup)
+								Correctioncounter = 1
+								correctionTable = {}
+								correction = false
+								end)
+							end	
+							
+							
+						end
+					end
 					if(counter <= string.len(word))then
 						if(event.key == "del")then
 							if(counter>1)then
@@ -149,8 +169,17 @@ function scene:create( event )
 									prevWords = {}
 									prevWords[#prevWords + 1] = word
 								end
-								timer.performWithDelay( 500, function() 
-								Next() 
+								timer.performWithDelay( 3000, function() 
+								word = getNextWord()
+								myText.text = word
+								wordTyped = ""
+								tospell = {}
+								linesGroup:removeSelf()
+								linesGroup = nil
+								linesGroup = display.newGroup()
+								redrawKeyboard()
+								drawLines()
+								counter = 1
 								sceneGroup:insert(linesGroup)
 								end)
 								
@@ -161,14 +190,32 @@ function scene:create( event )
 								for i=1,#tospell do
 									local letter = word:sub(i,i)
 									if(letter ~= tospell[i].text)then
-										tospell[i].text = letter
-										tospell[i]:setFillColor( 1, 0, 0 )
+										tospell[i].text = ""
+										
+										correction = true
+										local val ={}
+										val.text = word:sub(i,i)
+										val.pos = i
+										correctionTable[#correctionTable+1] = val
+										
+										--tospell[i]:setFillColor( 1, 0, 0 )
 									end
 								end
-								timer.performWithDelay( 500, function() 
-								Next() 
-								sceneGroup:insert(linesGroup)
-								end)
+								if(correction==false)then
+									timer.performWithDelay( 3000, function() 
+									word = getNextWord()
+									myText.text = word
+									wordTyped = ""
+									tospell = {}
+									linesGroup:removeSelf()
+									linesGroup = nil
+									linesGroup = display.newGroup()
+									redrawKeyboard()
+									drawLines()
+									counter = 1 
+									sceneGroup:insert(linesGroup)
+									end)
+								end
 							end
 						end
 						counter = counter + 1
@@ -185,38 +232,61 @@ function scene:create( event )
                 --flag of  the keyboard is set to true when the user touched its "OK" button
                 if(event.target.inputCompleted == true) then
                     print("Input of data complete...")
-                    --keyboard:destroy()
                     
-                   -- processKeyboard()
-                    
-                    --[[if (textField.text:upper() == tospell:upper()) then
-                    --keyboard:destroy()
-                    showKeyboard()
-                    end --]]
                 end
             end
         end
-
         --let the onScreenKeyboard know about the listener
         keyboard:setListener(  listener  )
-
         --show a keyboard with small printed letters as default. Read more about the possible values for keyboard types in the section "possible keyboard types"
         keyboard:drawKeyBoard(keyboard.keyBoardMode.letters_small)
-		--sceneGroup:insert(keyboard)
-	-- Called when the scene's view does not exist.
-	-- 
-	-- INSERT code here to initialize the scene
-	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
+		
+		
+		local enable = {"del"}
+		for i=1,string.len(word) do
+			local alreadyContains = false
+			for l=1,#enable do
+				if(enable[l]==word:sub(i,i)) then
+					alreadyContains = true
+				end
+			end
+			if(alreadyContains ==false)then
+				enable[#enable+1] = word:sub(i,i)
+			end
+		end
+        keyboard:displayOnly(enable)
+end
+local function Next()
+	word = getNextWord()
+	myText.text = word
+	wordTyped = ""
+	tospell = {}
+	linesGroup:removeSelf()
+	linesGroup = nil
+	linesGroup = display.newGroup()
+	redrawKeyboard()
+	drawLines()
+	counter = 1
+end
 
-	
-	
-	
-	 
-	-- all display objects must be inserted into group
-	--sceneGroup:insert( background )
-	--sceneGroup:insert( grass)
-	--sceneGroup:insert( crate )
-	--:insert( myText )
+function scene:create( event )
+		sceneGroup = self.view
+		local bg = display.newImage("background.png")
+		bg.anchorX =0
+		bg.anchorY =0
+		bg:setFillColor(1)
+		sceneGroup:insert(bg)
+		developerMode()
+        --create a textfield for the content created with the keyoard
+        --textField = display.newText("",  xInset * 10, yInset * 5, native.systemFont, 50)
+		
+        --textField:setTextColor(0,0,0)
+        --sceneGroup:insert(textField)
+		drawLines()
+		redrawKeyboard()
+		sceneGroup:insert(linesGroup)
+		
+		
 end
 
 function scene:show( event )

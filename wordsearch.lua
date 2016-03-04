@@ -14,10 +14,12 @@ local scene = composer.newScene( sceneName )
 ---------------------------------------------------------------------------------
 local isTouched = false
 local counter = 1
-local rows = 10
+local rows = 7
 local curRow = 1
-local columns = 10
+local columns = 7
 local curColumn = 1
+local rnum = math.random()
+local rNext =math.random()
 local colors ={{51/255, 204/255, 51/255},
 {0/255, 153/255, 255/255},
 {255/255, 153/255, 51/255},
@@ -27,17 +29,33 @@ local colors ={{51/255, 204/255, 51/255},
 local xInset = display.contentWidth/20
 local yInset = display.contentHeight/20
 local words ={}
-for i=1,5 do
-	r = math.random(300)
-	local word = gr3.getWord(r)
-	while(string.len(word)>9) do
+local compare ={"a","b","c","d","e"}
+local function getNextWord()
+	local r 
+	local word 
+	local check = true
+	while(check)do
+		check = false
 		r = math.random(300)
 		word = gr3.getWord(r)
+		if string.len(word)>6 then
+				check =true
+		end
+		for i=1,#words do
+			if word == words[i] then
+				check =true
+			end
+		end
 	end
 	word = string.gsub( word, "%-","")
 	word = string.lower( word )
-	words[i]=word
-	print(word)
+	return word
+end
+for i=1,5 do
+	
+	words[i]=getNextWord()
+	
+	print(words[i])
 	
 	
 end
@@ -55,6 +73,9 @@ end
 local wordgrid = display.newGroup()
 local linegrid = display.newGroup()
 local function nextStep()
+	rNext = math.random()
+	rnum = math.random()
+	--print("next"..rnum)
 	if(curColumn==columns)then
 		curRow = curRow + 1
 		if(curRow>rows)then
@@ -71,19 +92,23 @@ local function tryHPlacement()
 		local placement = true
 		local r = curRow
 		for i=1,#words[counter] do
-			print("1: "..matrix[curColumn][curRow].." 2 "..words[counter]:sub(i,i))
+			--print("1: "..matrix[curColumn][curRow].." 2 "..words[counter]:sub(i,i))
 			if(matrix[curColumn][r]~=words[counter]:sub(i,i) and matrix[curColumn][r]~=0)then
 				placement = false
 			end
 			r=r+1
 		end		
-		print(placement)
+		--print(placement)
 		if(placement)then
+			rnum = math.random()
 			for i=1,#words[counter] do
 			
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
-				if(i==1 or i==#words[counter])then
+				if(i==1)then
 				correctmask[curColumn][curRow] = counter
+				end
+				if(i==#words[counter])then
+				correctmask[curColumn][curRow] = compare[counter]
 				end
 				curRow=curRow+1
 			end
@@ -92,11 +117,9 @@ local function tryHPlacement()
 		nextStep()
 		end
 	else
-		if(curColumn<(columns - #words[counter])+1)then
-
-		else
+		
 		nextStep()
-		end
+		
 	end
 end
 local function tryVPlacement()
@@ -113,10 +136,14 @@ local function tryVPlacement()
 		end	
 		--print(placement)		
 		if(placement)then
+			rnum = math.random()
 			for i=1,#words[counter] do
 				matrix[curColumn][curRow] = words[counter]:sub(i,i)
-				if(i==1 or i==#words[counter])then
-					correctmask[curColumn][curRow] = counter
+				if(i==1)then
+				correctmask[curColumn][curRow] = counter
+				end
+				if(i==#words[counter])then
+				correctmask[curColumn][curRow] = compare[counter]
 				end
 				curColumn=curColumn+1
 			end
@@ -125,11 +152,9 @@ local function tryVPlacement()
 		nextStep()
 		end
 	else
-		if(curRow<(rows - #words[counter])+1)then
-		--place word
-		else
+		
 			nextStep()
-		end
+		
 	end
 end
 
@@ -138,17 +163,17 @@ function myTouchListener( event )
 	 if ( event.phase == "began" ) then
         -- Code executed when the button is touched
 		 isTouched = true
-		 iX = event.target.x +12/2
-		 iY = event.target.y + 12
+		 iX = event.target.x +15/2
+		 iY = event.target.y+15
 		
 		
-		circle = display.newCircle(iX, iY ,10)
+		circle = display.newCircle(iX, iY ,16)
 		--circle.x =iX
 		--circle.y =iY
-		if(r>4 or r == nil) then
+		if( r == nil or r>5) then
 			r = 1
 		else
-			r=r+1
+			
 		end
 		color =unpack(colors,r)
 		circle:setFillColor( color[1],color[2],color[3] )
@@ -158,7 +183,7 @@ function myTouchListener( event )
 		line.anchorX =0
 		line.anchorY =0
 		line:setStrokeColor( color[1],color[2],color[3] )
-		line.strokeWidth = 20
+		line.strokeWidth = 32
 		-- l = display.newLine( iX, iY, iX, iY )
 		-- l.anchorX =0
 		-- l.anchorY =0
@@ -172,6 +197,9 @@ function myTouchListener( event )
 		
 		if correctmask[event.target.c][event.target.r]~=0 then
 			correct = correctmask[event.target.c][event.target.r]
+			correctc =event.target.c
+			correctr =event.target.r
+			
 		end
         --print( "object touched = "..tostring(event.target) )  -- 'event.target' is the touched object
     elseif ( event.phase == "moved" ) then
@@ -189,13 +217,13 @@ function myTouchListener( event )
 			-- c1:removeSelf()
 			-- c1=nil
 		-- end
-		circle1 = display.newCircle(event.x-xInset,event.y-10,10)
+		circle1 = display.newCircle(event.x-xInset,event.y-yInset/2,16)
 		circle1:setFillColor( color[1],color[2],color[3])
-		line = display.newLine( iX, iY, event.x-xInset, event.y-10 )
+		line = display.newLine( iX, iY, event.x-xInset, event.y-yInset/2 )
 		line.anchorX =0
 		line.anchorY =0
 		line:setStrokeColor( color[1],color[2],color[3])
-		line.strokeWidth = 20
+		line.strokeWidth = 32
 		
 		-- c1 = display.newCircle(event.x,event.y-10,11)
 		-- c1:setFillColor( 0 )
@@ -213,8 +241,11 @@ function myTouchListener( event )
     elseif ( event.phase == "ended" ) then
         -- Code executed when the touch lifts off the object
 		if(isTouched)then
-			if correctmask[event.target.c][event.target.r]==correct then
+			if correctmask[event.target.c][event.target.r]==compare[correct] then
 				--correct = true
+				correctmask[event.target.c][event.target.r] = 0
+				correctmask[correctc][correctr] = 0
+				r=r+1
 			else
 				correct = false
 			end
@@ -230,13 +261,13 @@ function myTouchListener( event )
 				-- c1:removeSelf()
 				-- c1=nil
 			-- end
-			circle2 = display.newCircle(event.target.x+12/2,event.target.y+12,10)
+			circle2 = display.newCircle(event.target.x+15/2,event.target.y+15,16)
 			circle2:setFillColor(color[1],color[2],color[3] )
-			line = display.newLine( iX, iY, event.target.x+12/2, event.target.y+12)
+			line = display.newLine( iX, iY, event.target.x+15/2, event.target.y+15)
 			line.anchorX =0
 			line.anchorY =0
 			line:setStrokeColor( color[1],color[2],color[3] )
-			line.strokeWidth = 20
+			line.strokeWidth = 32
 			
 			-- c2 = display.newCircle(event.target.x+12/2,event.target.y+12,11)
 			-- c2:setFillColor( 0 )
@@ -250,7 +281,7 @@ function myTouchListener( event )
 			linegrid:insert(circle2)
 			linegrid:insert(line)
 			if(correct)then
-				print(correct)
+				--print(correct)
 			else
 				if(circle ~=nil)then
 				circle:removeSelf()
@@ -313,20 +344,26 @@ function scene:show( event )
 	   bg:setFillColor(1)
 	   sceneGroup:insert(bg)
 	  
-	   linegrid.y = yInset
+	   linegrid.y = 0
 	   linegrid.x = xInset
 	   sceneGroup:insert(linegrid)
 	   while(counter~=#words +1)do
-		   if(math.random()>0.1)then
+			--print("rNext "..rNext)
+			--print("rnum "..rnum)
+		   if(rNext>0.1)then
 				--Go to next step
+				--print("next"..rnum)
 				nextStep()
-		   else
+				
+		   elseif(rnum>0.4) then
 				--Place horizontal or vertical
-				 if(math.random()>0.5)then
+				
+					--print("tryHPlacement"..rnum)
 					tryHPlacement()
-				 else
+			else
+					--print("tryVPlacement"..rnum)
 					tryVPlacement()
-				 end
+				 
 		   end
 	   end
 	   local str="aaaabbbbbcddddeeeefgggghhhhiiiiijkkkkllllmmmmnnnnoooooppppqrrrrssstttttuuvvvwwwxyyyz"
@@ -359,13 +396,13 @@ function scene:show( event )
 				end
 				matrix[c][r] = randomL
 			end
-			local smallRect = display.newRect(0,0,25,25)
+			local smallRect = display.newRect(0,0,35,35)
 			smallRect.alpha=0
 			--smallRect:setFillColor(0)
 			smallRect.anchorX =0
 			smallRect.anchorY =0
-			smallRect.x = c*25
-			smallRect.y = r*25
+			smallRect.x = c*35
+			smallRect.y = r*35
 			smallRect.c =c
 			smallRect.r =r
 			smallRect.isHitTestable = true
@@ -378,16 +415,16 @@ function scene:show( event )
 				--x = 0,
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
-				font = native.systemFontBold,   
-				fontSize = 20,
-				align = "right"  --new alignment parameter
+				font = TeachersPet,   
+				fontSize = 28,
+				align = "center"  --new alignment parameter
 			}
 
 			local myText = display.newText( options )
 			myText.anchorX =0
 			myText.anchorY =0
-			myText.x = c*25
-			myText.y = r*25
+			myText.x = c*35
+			myText.y = r*35
 			myText:setFillColor( 0, 0, 0 )
 			wordgrid:insert(myText)
 			
@@ -400,21 +437,21 @@ function scene:show( event )
 					--x = 0,
 					--y = 200,
 					--width = 128,     --required for multi-line and alignment
-					font = native.systemFontBold,   
-					fontSize = 20,
-					align = "right"  --new alignment parameter
+					font = TeachersPet,   
+					fontSize = 28,
+					align = "center"  --new alignment parameter
 				}
 
 				local myText = display.newText( options )
 				myText.anchorX =0
 				myText.anchorY =0
-				myText.x = display.contentWidth - xInset*3
+				myText.x = display.contentWidth - xInset*4
 				myText.y = yInset*w*2 + yInset*2
 				myText:setFillColor( 0, 0, 0 )
 				sceneGroup:insert(myText)
 			end
 	   end
-	   wordgrid.y = yInset
+	   wordgrid.y = 0
 	   wordgrid.x = xInset
 	   sceneGroup:insert(wordgrid)
 	   
