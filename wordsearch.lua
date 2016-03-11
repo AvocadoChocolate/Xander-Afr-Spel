@@ -7,7 +7,7 @@
 local sceneName = ...
 
 local composer = require( "composer" )
-local gr3 = require("g3")
+local gr3 = require("gr1")
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
 
@@ -18,6 +18,7 @@ local rows = 7
 local curRow = 1
 local columns = 7
 local curColumn = 1
+local correctCounter =1
 local rnum = math.random()
 local rNext =math.random()
 local colors ={{51/255, 204/255, 51/255},
@@ -26,17 +27,33 @@ local colors ={{51/255, 204/255, 51/255},
 {255/255, 255/255, 51/255},
 {204/255, 102/255, 255/255}
 }
+local wordgrid = display.newGroup()
+local linegrid = display.newGroup()
 local xInset = display.contentWidth/20
 local yInset = display.contentHeight/20
 local words ={}
+local wordsSearchGroup = display.newGroup()
 local compare ={"a","b","c","d","e"}
+local function gotoHome(event)
+	transition.to(wordsSearchGroup,{time=1000,x = -display.contentWidth*2,onComplete = function() 
+	composer.gotoScene("menu",{time = 500,effect="fromRight"}) 
+	transition.to(wordsSearchGroup,{time=1500,x = 0})
+	end})
+	
+	return true
+end
+local function Next()
+	composer.removeScene("wordsearch")
+	timer.performWithDelay( 500, function() composer.gotoScene("wordsearch")end )
+	
+end
 local function getNextWord()
 	local r 
 	local word 
 	local check = true
 	while(check)do
 		check = false
-		r = math.random(300)
+		r = math.random(100)
 		word = gr3.getWord(r)
 		if string.len(word)>6 then
 				check =true
@@ -70,8 +87,7 @@ for c=1,columns do
 		correctmask[c][r] = 0
 	end
 end
-local wordgrid = display.newGroup()
-local linegrid = display.newGroup()
+
 local function nextStep()
 	rNext = math.random()
 	rnum = math.random()
@@ -196,7 +212,7 @@ function myTouchListener( event )
 		linegrid:insert(line)
 		
 		if correctmask[event.target.c][event.target.r]~=0 then
-			correct = correctmask[event.target.c][event.target.r]
+			cor = correctmask[event.target.c][event.target.r]
 			correctc =event.target.c
 			correctr =event.target.r
 			
@@ -217,9 +233,9 @@ function myTouchListener( event )
 			-- c1:removeSelf()
 			-- c1=nil
 		-- end
-		circle1 = display.newCircle(event.x-xInset,event.y-yInset/2,16)
+		circle1 = display.newCircle(event.x-xInset*3,event.y-yInset/2,16)
 		circle1:setFillColor( color[1],color[2],color[3])
-		line = display.newLine( iX, iY, event.x-xInset, event.y-yInset/2 )
+		line = display.newLine( iX, iY, event.x-xInset*3, event.y-yInset/2 )
 		line.anchorX =0
 		line.anchorY =0
 		line:setStrokeColor( color[1],color[2],color[3])
@@ -241,13 +257,17 @@ function myTouchListener( event )
     elseif ( event.phase == "ended" ) then
         -- Code executed when the touch lifts off the object
 		if(isTouched)then
-			if correctmask[event.target.c][event.target.r]==compare[correct] then
-				--correct = true
+			if correctmask[event.target.c][event.target.r]==compare[cor] then
+				--cor = true
+				if(correctCounter == 5)then
+					Next()
+				end
+				correctCounter = correctCounter + 1
 				correctmask[event.target.c][event.target.r] = 0
 				correctmask[correctc][correctr] = 0
 				r=r+1
 			else
-				correct = false
+				cor = false
 			end
 			line:removeSelf()
 			line= nil
@@ -280,8 +300,8 @@ function myTouchListener( event )
 			--linegrid:insert(l)
 			linegrid:insert(circle2)
 			linegrid:insert(line)
-			if(correct)then
-				--print(correct)
+			if(cor)then
+				--print(cor)
 			else
 				if(circle ~=nil)then
 				circle:removeSelf()
@@ -315,8 +335,9 @@ function myTouchListener( event )
     return true  -- Prevents touch propagation to underlying objects
     
 end
+
 function scene:create( event )
-    local sceneGroup = self.view
+    sceneGroup = self.view
 
     -- Called when the scene's view does not exist
     -- 
@@ -343,10 +364,17 @@ function scene:show( event )
 	   bg.anchorY =0
 	   bg:setFillColor(1)
 	   sceneGroup:insert(bg)
-	  
-	   linegrid.y = 0
-	   linegrid.x = xInset
-	   sceneGroup:insert(linegrid)
+		menuGroup = display.newGroup()
+		local mCircle = display.newImage("Icon1.png")
+		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
+		menuGroup:insert(mCircle)
+		menuGroup.x =  xInset*2
+		menuGroup.y =  yInset*2
+		menuGroup:addEventListener( "tap", gotoHome )
+		wordsSearchGroup:insert(menuGroup)
+		linegrid.y = yInset
+		linegrid.x = xInset*3
+		wordsSearchGroup:insert(linegrid)
 	   while(counter~=#words +1)do
 			--print("rNext "..rNext)
 			--print("rnum "..rnum)
@@ -448,12 +476,13 @@ function scene:show( event )
 				myText.x = display.contentWidth - xInset*4
 				myText.y = yInset*w*2 + yInset*2
 				myText:setFillColor( 0, 0, 0 )
-				sceneGroup:insert(myText)
+				wordsSearchGroup:insert(myText)
 			end
 	   end
-	   wordgrid.y = 0
-	   wordgrid.x = xInset
-	   sceneGroup:insert(wordgrid)
+	   wordgrid.y = yInset
+	   wordgrid.x = xInset*3
+	   wordsSearchGroup:insert(wordgrid)
+	   sceneGroup:insert(wordsSearchGroup)
 	   
     end 
 end

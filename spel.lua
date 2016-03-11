@@ -1,6 +1,6 @@
 local composer = require( "composer" )
 require("onScreenKeyboard") -- include the onScreenKeyboard.lua file
-local gr3 = require("g3")
+local gr3 = require("gr1")
 local scene = composer.newScene()
 local keyboard
 local myText
@@ -9,26 +9,50 @@ local tospell = {}
 local counter = 1
 local Correctioncounter = 1
 local sceneGroup
+local menuGroup
 local screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
-
+local list
+local playersList = getPlayers()
 local linesGroup = display.newGroup()
 local wordTyped = ""
+local spelGroup = display.newGroup()
 local prevWords = {}
 local correction = false
 local correctionTable = {}
+local wordSound
+local wordChannel
+-----
+local function gotoHome(event)
+	transition.to(spelGroup,{time=500,y = - display.contentHeight,onComplete = function() 
+	transition.to(spelGroup,{time=1500,y = 0})
+	end})
+	addAndSaveIncorrectWords(list)
+	playersList[1].correct = correct
+	playersList[1].incorrect = incorrect
+	addAndSavePlayers(playersList)
+	if(keyboard~=nil)then
+		keyboard:destroy()
+		keyboard = nil
+	end
+	composer.gotoScene("menu",{time = 500,effect="fromBottom"}) 
+	return true
+end
 local function getNextWord()
 	local r 
 	local word 
 	local check = true
 	while(check)do
 		check = false
-		r = math.random(300)
+		r = math.random(100)
 		word = gr3.getWord(r)
+		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+		wordChannel = audio.play( wordSound )
 		for i=1,#prevWords do
 			if word == prevWords[i] then
 				check =true
 			end
+
 		end
 	end
 	word = string.gsub( word, "%-","")
@@ -45,7 +69,7 @@ local function developerMode()
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = native.systemFontBold,   
+			font = TeachersPet,   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -79,7 +103,7 @@ local function drawLines()
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = native.systemFontBold,   
+			font = TeachersPet,   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -100,9 +124,10 @@ end
 local function redrawKeyboard()
 		if(keyboard~=nil)then
 			keyboard:destroy()
+			keyboard = nil
 		end
 		
-		
+		print("drawKeyBoard")
 		keyboard = onScreenKeyboard:new()
 		
         --create a listener function that receives the events of the keyboard
@@ -121,15 +146,17 @@ local function redrawKeyboard()
 							if(Correctioncounter>#correctionTable) then
 								--Get next word
 								print("correct")
+								
 								if(#prevWords < 5) then
 									prevWords[#prevWords + 1] = word
 								else
 									prevWords = {}
 									prevWords[#prevWords + 1] = word
 								end
-								timer.performWithDelay( 3000, function() 
+								menuGroup:removeEventListener("tap",gotoHome)
+								timer.performWithDelay( 2000, function() 
 								word = getNextWord()
-								myText.text = word
+								--myText.text = word
 								wordTyped = ""
 								tospell = {}
 								linesGroup:removeSelf()
@@ -138,10 +165,11 @@ local function redrawKeyboard()
 								redrawKeyboard()
 								drawLines()
 								counter = 1
-								sceneGroup:insert(linesGroup)
+								spelGroup:insert(linesGroup)
 								Correctioncounter = 1
 								correctionTable = {}
 								correction = false
+								menuGroup:addEventListener( "tap", gotoHome )
 								end)
 							end	
 							
@@ -163,15 +191,17 @@ local function redrawKeyboard()
 							if(wordTyped ==  word) then
 								--Get next word
 								print("correct")
+								correct = correct + 1
 								if(#prevWords < 5) then
 									prevWords[#prevWords + 1] = word
 								else
 									prevWords = {}
 									prevWords[#prevWords + 1] = word
 								end
-								timer.performWithDelay( 3000, function() 
+								menuGroup:removeEventListener("tap",gotoHome)
+								timer.performWithDelay( 2000, function() 
 								word = getNextWord()
-								myText.text = word
+								--myText.text = word
 								wordTyped = ""
 								tospell = {}
 								linesGroup:removeSelf()
@@ -180,13 +210,15 @@ local function redrawKeyboard()
 								redrawKeyboard()
 								drawLines()
 								counter = 1
-								sceneGroup:insert(linesGroup)
+								spelGroup:insert(linesGroup)
+								menuGroup:addEventListener( "tap", gotoHome )
 								end)
 								
 								
 								
 							else
 							--show correct go to next word after pause
+								incorrect = incorrect + 1
 								for i=1,#tospell do
 									local letter = word:sub(i,i)
 									if(letter ~= tospell[i].text)then
@@ -202,7 +234,8 @@ local function redrawKeyboard()
 									end
 								end
 								if(correction==false)then
-									timer.performWithDelay( 3000, function() 
+									menuGroup:removeEventListener("tap",gotoHome)
+									timer.performWithDelay( 2000, function() 
 									word = getNextWord()
 									myText.text = word
 									wordTyped = ""
@@ -213,8 +246,14 @@ local function redrawKeyboard()
 									redrawKeyboard()
 									drawLines()
 									counter = 1 
-									sceneGroup:insert(linesGroup)
+									spelGroup:insert(linesGroup)
+									menuGroup:addEventListener( "tap", gotoHome )
 									end)
+								else
+									--Add word to incorrect words list
+									list[#list+1] = word
+									
+									keyboard:shakeLetters(correctionTable)
 								end
 							end
 						end
@@ -231,8 +270,7 @@ local function redrawKeyboard()
                 --check whether the user finished writing with the keyboard. The inputCompleted
                 --flag of  the keyboard is set to true when the user touched its "OK" button
                 if(event.target.inputCompleted == true) then
-                    print("Input of data complete...")
-                    
+                    print("Input of data complete...") 
                 end
             end
         end
@@ -255,6 +293,9 @@ local function redrawKeyboard()
 			end
 		end
         keyboard:displayOnly(enable)
+		-- timer.performWithDelay(2000,function()  end)
+		
+		
 end
 local function Next()
 	word = getNextWord()
@@ -264,28 +305,46 @@ local function Next()
 	linesGroup:removeSelf()
 	linesGroup = nil
 	linesGroup = display.newGroup()
+	spelGroup:insert(linesGroup)
 	redrawKeyboard()
 	drawLines()
 	counter = 1
+	
 end
 
 function scene:create( event )
-		sceneGroup = self.view
+		local sceneGroup = self.view
+		
 		local bg = display.newImage("background.png")
 		bg.anchorX =0
 		bg.anchorY =0
 		bg:setFillColor(1)
-		sceneGroup:insert(bg)
-		developerMode()
+		spelGroup:insert(bg)
+		menuGroup = display.newGroup()
+		local mCircle = display.newImage("Icon1.png")
+		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
+		menuGroup:insert(mCircle)
+		menuGroup.x =  xInset*2
+		menuGroup.y =  yInset*2
+		menuGroup:addEventListener( "tap", gotoHome )
+		--sceneGroup:insert(menuGroup)
+		spelGroup:insert(menuGroup)
+		list = getIncorrectWords()
+		--developerMode()
+		--sceneGroup:insert(myText)
         --create a textfield for the content created with the keyoard
         --textField = display.newText("",  xInset * 10, yInset * 5, native.systemFont, 50)
-		
         --textField:setTextColor(0,0,0)
         --sceneGroup:insert(textField)
 		drawLines()
 		redrawKeyboard()
-		sceneGroup:insert(linesGroup)
-		
+		spelGroup:insert(linesGroup)
+		print("scene created")
+		sceneGroup:insert(spelGroup)
+		print(keyboard)
+		if(keyboard ~= nil)then
+			redrawKeyboard()
+		end
 		
 end
 
@@ -300,22 +359,12 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
+		if(keyboard == nil)then
+			redrawKeyboard()
+		end
 	end
 end
 
-function processKeyboard()
-	--if (textField.text:upper() == tospell:upper()) then
-	--keyboard:destroy()
-	--showKeyboard()
-	--local chosenword = chooseWord()
-	--textField.text = ""
-	--keyboard.text = ""
-	--tospell = chosenword.spelling
-	--sceneGroup:remove(myText)
-	--myText = display.newText(tospell, 100, 200, native.systemFont, 16 )	
-	--sceneGroup:insert(myText)
-    --end
-end
 
 function scene:hide( event )
 	local sceneGroup = self.view
@@ -329,6 +378,7 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
+		
 	end	
 	
 end
@@ -340,6 +390,7 @@ function scene:destroy( event )
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	local sceneGroup = self.view
+	
 end
 
 ---------------------------------------------------------------------------------

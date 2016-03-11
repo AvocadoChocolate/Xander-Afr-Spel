@@ -165,7 +165,7 @@ function onScreenKeyboard:new(params)
                    btnFontName         = "Arial"                                                        ,
                    keyBoardMode        = {letters_small = 1, letters_large = 2, numbers = 3, signs = 4} ,
                    maxTextLength       = 0                                                              ,
-                   startX              = display.contentWidth/20                                                             ,
+                   startX              = 10                                                            ,
                    startY              = (display.contentHeight/2)                                      ,
                    breakerItem         = "BREAK"                                                        ,
                    keySpace            = 5                                                              ,
@@ -173,7 +173,8 @@ function onScreenKeyboard:new(params)
                    textUpdater         = nil                                                            ,
                    userListenerCaller  = nil                                                            ,
                    currentKeyboardMode = nil															,
-                   enableOnly		   = nil
+                   enableOnly		   = nil															,
+				   buttons             = {}
                 }
 
  --[[
@@ -322,7 +323,8 @@ function onScreenKeyboard:new(params)
     Getter for self.text
   ]]--
  function object:getText()
-  return self.text:sub( string.len(self.text),string.len(self.text))
+	local l = string.len(self.text)
+  return self.text:sub( l,l)
  end
 
  --[[
@@ -344,6 +346,7 @@ function onScreenKeyboard:new(params)
     Factory method to create a display group for a keyboard button
   ]]--
  function object:createButton(sign, width, height)
+ --print("create")
    local buttonGroup = display.newGroup()
 	 --animation that will be shown, when the user touches a key button
    local touchAnimation = function(event)
@@ -362,11 +365,21 @@ function onScreenKeyboard:new(params)
    local backGround = display.newRoundedRect(0,0,width,height,3)
    
    --backGround:setAnchorPoint(display.TopLeftReferencePoint)
-   backGround.anchorX = 0
-   backGround.anchorY = 0
+   backGround.anchorX = 0.5
+   backGround.anchorY = 0.5
+   local initX,initY = backGround.x,backGround.y
+   backGround.x = backGround.contentWidth / 2
+   backGround.y = backGround.contentHeight / 2
    local eo = self.enableOnly
+   
    backGround:setFillColor(0.8)
    buttonGroup:insert(backGround)
+   local buttonValue ={}
+   buttonValue.backGround = backGround
+   buttonValue.sign = sign:upper()
+   --print(#self.buttons)
+   
+   
    --buttonGroup.alpha = 0
    if eo ~= nil then
    		for letters = 1, #eo do
@@ -377,6 +390,9 @@ function onScreenKeyboard:new(params)
 				--buttonGroup.alpha = 1
   			end
 		end
+	else
+				backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
+				buttonGroup:addEventListener("touch", touchAnimation)
    end
    --backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
    
@@ -386,10 +402,10 @@ function onScreenKeyboard:new(params)
    btnText.anchorX = 0.5
    btnText.anchorY = 0.5
    --btnText:setReferencePoint(display.CenterReferencePoint)
-   btnText.x = backGround.x + backGround.width/2
-   btnText.y = backGround.y + backGround.height/2
+   btnText.x = initX + backGround.width/2
+   btnText.y = initY + backGround.height/2
    buttonGroup:insert(btnText)
-
+	
    --Make sure that the text is not larger than the surrounding background
    while(btnText.width > backGround.width or btnText.width > backGround.height) do
     btnText.size= btnText.size-1
@@ -401,8 +417,9 @@ function onScreenKeyboard:new(params)
    
    buttonGroup.anchorX = 0
    buttonGroup.anchorY = 1
+   buttonValue.group = buttonGroup
    --buttonGroup:setReferencePoint(display.topLeftReferencePoint)
-
+	self.buttons[#self.buttons+1] = buttonValue
    return buttonGroup
  end
 
@@ -434,7 +451,7 @@ function onScreenKeyboard:new(params)
 
         if(mode == self.keyBoardMode.letters_large) then
             self.currentKeyboardMode = mode
-            self:drawLetterKeyboard(width, height, false)
+            self:drawLargeLetterKeyboard(width, height, false)
         end
 
         if(mode == self.keyBoardMode.numbers) then
@@ -461,6 +478,23 @@ function onScreenKeyboard:new(params)
     end
  end
 
+ function object:shakeLetters(letters)
+	local buttons = self.buttons
+	--print("shake")
+	for j=1,#letters do
+		for i =1,#buttons do
+			local text =letters[j].text
+			if(text:upper() == buttons[i].sign) then
+				--print("in transition")
+				local m = 0
+				local sX = buttons[i].backGround.x
+				transition.to(buttons[i].backGround,{time =120 ,rotation= 5,x =  sX + display.contentWidth/150,iterations = 3,onRepeat =function() 
+					transition.to(buttons[i].backGround,{time =120 ,rotation = -5,x= sX - display.contentWidth/150})
+				end,onComplete =function() transition.to(buttons[i].backGround,{time =6,rotation = 0 ,x=sX}) end})
+			end
+		end
+	end
+ end
 
  --[[
         Create the keys for a virtual keyboard that contains small printed letters
@@ -498,7 +532,7 @@ function onScreenKeyboard:new(params)
 
        if(currentItem ~= self.breakerItem) then
            local btnGroup = self:createButton(currentItem, maxButtonWidth, maxButtonHeight)
-           btnGroup.x = startX + (maxButtonWidth*buttonsOfRow) + (buttonsOfRow * self.keySpace)
+           btnGroup.x = startX + (maxButtonWidth*buttonsOfRow) + (buttonsOfRow * self.keySpace) -5
            btnGroup.y = startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
            btnGroup.character = currentItem
            btnGroup.inputCompleted=false
@@ -513,8 +547,11 @@ function onScreenKeyboard:new(params)
 					if (currentItem:upper() == eo[letters]:upper()) then
 						
 						btnGroup:addEventListener("touch", self.userListenerCaller)
+						
 					end
 				end
+			else
+				btnGroup:addEventListener("touch", self.userListenerCaller)
 		   end
            
 
@@ -557,7 +594,7 @@ function onScreenKeyboard:new(params)
 
     --draw the delete button
     local btnGroup = self:createButton("DEL", maxButtonWidth*1.5, maxButtonHeight)
-    btnGroup.x = (8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg
+    btnGroup.x = (8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg -5
     btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
     btnGroup.character = "del"
     btnGroup.inputCompleted=false
@@ -632,6 +669,181 @@ function onScreenKeyboard:new(params)
 
     --call the user defined listener for the key touch events
     --btnGroup:addEventListener("touch", self.userListenerCaller)
+ end
+
+ --[[
+        Create the keys for a virtual keyboard that contains small printed letters
+    ]]--
+ function object:drawLargeLetterKeyboard(width, height, smallLetters)
+    local numberOfKeyRowsToDraw = 3
+    local startX                = self.startX
+    local startY                = self.startY
+    local startXOrg             = self.startX
+    local lettersToDraw         = {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p", self.breakerItem, "a", "s", "d", "f", "g", "h", "j", "k", "l", self.breakerItem, "z", "x", "c", "v", "b", "n", "m"}
+
+    --check how many objects the longest button row will consist of
+    local firstRowLength=0
+    for i=1,#lettersToDraw do
+        if(lettersToDraw[i] == self.breakerItem) then
+            firstRowLength = i-1
+            break
+        end
+    end
+
+    --create necessary counter vars for the following creation process loop
+    local totalRows    = 0
+    local buttonsOfRow = 0
+
+    --check how width and height the buttons can be in maximum
+    local maxButtonWidth  = ( (display.contentWidth -self.startX) - ((firstRowLength-1) * self.keySpace) ) / firstRowLength
+    local maxButtonHeight = (display.contentHeight - self.startY - (numberOfKeyRowsToDraw*self.keySpace)) / ( numberOfKeyRowsToDraw )
+
+    --create the keys for each necessary element
+    for i=1,#lettersToDraw do
+       local currentItem = lettersToDraw[i]
+
+       --check whether to use small or large letters
+       if(smallLetters == false)then    currentItem = string.upper(currentItem)    end
+
+       if(currentItem ~= self.breakerItem) then
+           local btnGroup = self:createButton(currentItem, maxButtonWidth, maxButtonHeight)
+           btnGroup.x = startX + (maxButtonWidth*buttonsOfRow) + (buttonsOfRow * self.keySpace) -5
+           btnGroup.y = startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+           btnGroup.character = currentItem
+           btnGroup.inputCompleted=false
+           btnGroup:addEventListener("touch", self.textUpdater)
+           self.displayGroup:insert(btnGroup)
+
+           --call the user defined listener for the key touch events
+		   local eo = self.enableOnly
+		   if eo ~= nil then
+				for letters = 1, #eo do
+					
+					if (currentItem:upper() == eo[letters]:upper()) then
+						
+						btnGroup:addEventListener("touch", self.userListenerCaller)
+						
+					end
+				end
+			else
+				btnGroup:addEventListener("touch", self.userListenerCaller)
+		   end
+           
+
+           buttonsOfRow = buttonsOfRow+1
+       else
+           buttonsOfRow = 0
+           totalRows    = totalRows +1
+
+           if(totalRows == 1) then
+            startX = (maxButtonWidth/2 + self.keySpace) + startXOrg
+           else
+            startX = ((maxButtonWidth * 1.5) + (2 * self.keySpace)) + startXOrg
+           end
+       end
+    end
+
+    --draw SHIFT-Button
+    -- local btnGroup = self:createButton("SHIFT", maxButtonWidth*1.5+self.keySpace, maxButtonHeight)
+    -- btnGroup.x = startXOrg
+    -- btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    -- btnGroup.inputCompleted=false
+
+    -- if(smallLetters == true)then
+        -- btnGroup.nextKeyboardStyle = self.keyBoardMode.letters_large
+    -- else
+        -- btnGroup.nextKeyboardStyle = self.keyBoardMode.letters_small
+    -- end
+
+    --listener function for the SHIFT button
+    -- local changeKeyBoard = function(event)
+                            -- if(event.phase == "ended") then
+                                -- self:drawKeyBoard(event.target.nextKeyboardStyle)
+                            -- end
+                            -- return false
+                           -- end
+    -- btnGroup:addEventListener("touch", changeKeyBoard)
+    -- self.displayGroup:insert(btnGroup)
+
+
+
+    --draw the delete button
+    local btnGroup = self:createButton("DEL", maxButtonWidth*1.5, maxButtonHeight)
+    btnGroup.x = (8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg -5
+    btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    btnGroup.character = "del"
+    btnGroup.inputCompleted=false
+
+    --listener function for the delete button
+    local deleteSign= function(event)
+                        if(event.phase == "ended") then
+                            self.text = string.sub(self.text, 1, string.len(self.text)-1)
+                        end
+                        return false
+                      end
+    btnGroup:addEventListener("touch", deleteSign)
+    self.displayGroup:insert(btnGroup)
+
+    --totalRows    = totalRows +1
+    --buttonsOfRow = 0
+
+    --call the user defined listener for the key touch events
+    btnGroup:addEventListener("touch", self.userListenerCaller)
+
+
+
+    --draw the keyboard switch button
+    -- local btnGroup = self:createButton("123...", maxButtonWidth*1.5+self.keySpace, maxButtonHeight)
+    -- btnGroup.x = startXOrg
+    -- btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    -- btnGroup.inputCompleted=false
+
+    --listener function for the keyboard switch button
+    -- local changeKeyBoard = function(event)
+                            -- if(event.phase == "ended") then
+                                -- self:drawKeyBoard(self.keyBoardMode.numbers)
+                            -- end
+                           -- end
+    -- btnGroup:addEventListener("touch", changeKeyBoard)
+    -- self.displayGroup:insert(btnGroup)
+
+
+
+    --draw the space button
+    -- local btnGroup = self:createButton("[                 ]", maxButtonWidth*5 + 4*self.keySpace, maxButtonHeight)
+    -- btnGroup.x = (startXOrg + maxButtonWidth*1.5) + 2*self.keySpace
+    -- btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    -- btnGroup:addEventListener("touch", self.textUpdater)
+    -- btnGroup.character = " "
+    -- btnGroup.inputCompleted=false
+    -- self.displayGroup:insert(btnGroup)
+
+    --call the user defined listener for the key touch events
+    --btnGroup:addEventListener("touch", self.userListenerCaller)
+
+
+
+    --draw the enter button that puts in a line break into the text the keyboard
+    -- local btnGroup = self:createButton("ENTER", maxButtonWidth*2+self.keySpace, maxButtonHeight)
+    -- btnGroup.x = (6.5 * maxButtonWidth + (7 * self.keySpace)) + startXOrg
+    -- btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    -- btnGroup:addEventListener("touch", self.textUpdater)
+    -- btnGroup.character = "\n"
+    -- btnGroup.inputCompleted=false
+    -- self.displayGroup:insert(btnGroup)
+
+
+
+    --draw the done button that closes the keyboard
+    local btnGroup = self:createButton("OK", maxButtonWidth*1.5, maxButtonHeight)
+    btnGroup.x =  startXOrg--(8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg
+    btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    btnGroup.character = "ok"
+    btnGroup.inputCompleted=true
+    self.displayGroup:insert(btnGroup)
+
+    --call the user defined listener for the key touch events
+    btnGroup:addEventListener("touch", self.userListenerCaller)
  end
 
 
@@ -770,11 +982,6 @@ function onScreenKeyboard:new(params)
     --call the user defined listener for the key touch events
     btnGroup:addEventListener("touch", self.userListenerCaller)
  end
-
-
-
-
-
 
 
 --[[
@@ -933,8 +1140,12 @@ function onScreenKeyboard:new(params)
     Hide the entire keyboard
    ]]--
  function object:hide()
-    if(self.displayGroup ~= nil) then
-        transition.to(self.displayGroup, {alpha = 0, time=self.animationDuration})
+	
+    if(self.buttons ~= nil) then
+		print(#self.buttons)
+		for i=1,#self.buttons do
+			self.buttons[i].group.alpha  = 0
+		end
     end
  end
 

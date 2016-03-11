@@ -7,7 +7,7 @@
 local sceneName = ...
 
 local composer = require( "composer" )
-local gr3 = require("g3")
+local gr3 = require("gr1")
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
 
@@ -15,19 +15,82 @@ local scene = composer.newScene( sceneName )
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
 local word =""
 local vowels = {"a","e","i","o","u","y"}
+-- local h = 30
+-- local w = 30
+-- local blocks = {
+-- {"a",h},
+-- {"b",-2*h},
+-- {"c",h},
+-- {"d",-2*h},
+-- {"e",h},
+-- {"f",-2*h},
+-- {"g",2*h},
+-- {"h",-2*h},
+-- {"i",-2*h},
+-- {"j",2*h},
+-- {"k",-2*h},
+-- {"l",-2*h},
+-- {"m",h},
+-- {"n",h},
+-- {"o",h},
+-- {"p",2*h},
+-- {"q",2*h},
+-- {"r",h},
+-- {"s",h},
+-- {"t",-2*h},
+-- {"u",h},
+-- {"v",h},
+-- {"w",h},
+-- {"x",h},
+-- {"y",2*h},
+-- {"z",h}
+-- }
 local prevWords = {}
 local pieces = {}
+local mpieces = {}
 local tospell = {}
+local counter = 1
+local wordsGroup = display.newGroup()
 local linesGroup = display.newGroup()
+local bouGroup = display.newGroup()
+local function gotoHome(event)
+	--composer.gotoScene("menu")
+	transition.to(bouGroup,{time=500,y =  display.contentHeight,onComplete = function() 
+	composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
+	transition.to(bouGroup,{time=1500,y = 0,onComplete = function() 
+	bouGroup:removeSelf()
+	bouGroup = nil
+	bouGroup = display.newGroup()
+	linesGroup:removeSelf()
+	linesGroup = nil
+	linesGroup = display.newGroup()
+	bouGroup:insert(linesGroup)
+	wordsGroup:removeSelf()
+	wordsGroup = nil
+	wordsGroup = display.newGroup()
+	bouGroup:insert(wordsGroup)
+	pieces = {}
+	mpieces ={}
+	tospell = {}
+	
+	end})
+	end})
+	
+	return true
+end
+
 local function getNextWord()
 	local r 
 	local word 
 	local check = true
 	while(check)do
 		check = false
-		r = math.random(300)
+		r = math.random(100)
 		word = gr3.getWord(r)
 		for i=1,#prevWords do
+			if(string.len(word)<3) then
+				check =true
+			end
 			if word == prevWords[i] then
 				check =true
 			end
@@ -127,6 +190,26 @@ local function splitCheck(splitWord)
 		end
 	end
 end
+local function splitMCheck(splitWord)
+	
+	if(string.len(splitWord)<6)then
+		mpieces[#mpieces+1]=splitWord
+	else
+		local m1,m2 = splitDoubleConsonants(splitWord)
+		if(m1 ~= nil and m2 ~= nil)then
+			
+			splitMCheck(m1)
+			splitMCheck(m2)
+		else
+			--split on first vowel
+			local m1,m2 = splitFirstVowel(splitWord)
+			if(m1 ~= nil and m2 ~= nil)then
+				splitMCheck(m1)
+				splitMCheck(m2)
+			end
+		end
+	end
+end
 local function drawLines()
 	linesGroup.anchorChildren = true
 	linesGroup.anchorX = 0.5
@@ -141,7 +224,7 @@ local function drawLines()
 		local wordSize = string.len(part)
 		
 		for j=1,wordSize do
-			print()
+			
 			local dash = display.newLine(i*(xInset),yInset*5, i*(xInset) + 15,yInset*5)
 			dash:setStrokeColor(255/255, 51/255, 204/255)
 			dash.strokeWidth = 2
@@ -153,7 +236,7 @@ local function drawLines()
 				--x = 0,
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
-				font = native.systemFontBold,   
+				font = TeachersPet,   
 				fontSize = 20,
 				align = "right"  --new alignment parameter
 			}
@@ -172,41 +255,208 @@ local function drawLines()
 		end
 	end
 end
-local function drag( event )
-	
-    if event.phase == "began" then
-	
-        markX = event.target.x    -- store x location of object
-        markY = event.target.y    -- store y location of object
-		display.getCurrentStage():setFocus( event.target )
-    elseif event.phase == "moved" then
-	
-        local x = (event.x - event.xStart) + markX
-        local y = (event.y - event.yStart) + markY
-        
-        event.target.x, event.target.y = x, y    -- move object based on calculations above
-    elseif event.phase == "ended" or event.phase == "cancelled" then
-        event.target.alpha = 1
-		for i=1,#tospell do
-			if hasCollided(event.target,tospell[i]) then
-				if event.target.pos == tospell[i].pos then
-					for j =1,#tospell do
-						if(tospell[j].pos == tospell[i].pos)then
-							tospell[j].text = word:sub(j,j)
-							event.target.alpha = 0
+
+local function Next()
+		word = getNextWord()
+		mockWord = getNextWord()
+		print(word)
+		local s1,s2 = splitDoubleConsonants(word)
+		
+		if(s1 ~= nil and s2 ~= nil)then
+			
+			splitCheck(s1)
+			splitCheck(s2)
+		else
+			--split on first vowel
+			local s1,s2 = splitFirstVowel(word)
+			if(s1 ~= nil and s2 ~= nil)then
+				splitCheck(s1)
+				splitCheck(s2)
+			end
+		end
+		drawLines()
+		local m1,m2 = splitDoubleConsonants(mockWord)
+		if(m1 ~= nil and m2 ~= nil)then
+			
+			splitMCheck(m1)
+			splitMCheck(m2)
+		else
+			--split on first vowel
+			local m1,m2 = splitFirstVowel(mockWord)
+			if(m1 ~= nil and m2 ~= nil)then
+				splitMCheck(m1)
+				splitMCheck(m2)
+			end
+		end
+		
+		local function drag( event )
+			if event.phase == "began" then
+				collided = false
+				markX = event.target.x    -- store x location of object
+				markY = event.target.y    -- store y location of object
+				display.getCurrentStage():setFocus( event.target )
+			elseif event.phase == "moved" then
+			
+				local x = (event.x - event.xStart) + markX
+				local y = (event.y - event.yStart) + markY
+				
+				event.target.x, event.target.y = x, y    -- move object based on calculations above
+			elseif event.phase == "ended" or event.phase == "cancelled" then
+				event.target.alpha = 1
+				
+				for i=1,#tospell do
+					if hasCollided(event.target,tospell[i]) then
+						if event.target.pos == tospell[i].pos then
+							for j =1,#tospell do
+								if(tospell[j].pos == tospell[i].pos)then
+									tospell[j].text = word:sub(j,j)
+									event.target.alpha = 0
+									collided = true
+								end
+							end
 						end
 					end
 				end
+				display.getCurrentStage():setFocus(nil)
+				print(#pieces)
+				if(collided)then
+					if(counter == #pieces)then
+						linesGroup:removeSelf()
+						linesGroup = nil
+						linesGroup = display.newGroup()
+						bouGroup:insert(linesGroup)
+						wordsGroup:removeSelf()
+						wordsGroup = nil
+						wordsGroup = display.newGroup()
+						bouGroup:insert(wordsGroup)
+						pieces = {}
+						mpieces ={}
+						tospell = {}
+						Next()
+						counter = 1
+					else
+						counter = counter + 1
+					end
+				
+				end
 			end
+			
+			return true
 		end
-        display.getCurrentStage():setFocus(nil)
-    end
-    
-    return true
-end
+		
+		
+		for i=1,#pieces do
+			-- local pieceGroup = display.newGroup()
+			local r = math.random(5)
+			-- for j=1,string.len(pieces[i]) do
+				-- local x = 0
+				-- local letter = pieces[i]:sub(j,j)
+				-- for k = 1,#blocks do
+					-- if(blocks[k][1]==letter)then
+						-- if(blocks[k][2] == h)then
+							-- height = blocks[k][2]
+						-- elseif(blocks[k][2] == 2*h)then
+							-- height = h + 0.5*h
+						-- elseif(blocks[k][2] == -2*h)then
+							-- height =  - h - 0.5*h
+							-- x = h
+						-- end
+					-- end
+				-- end
+				
+				-- local block = display.newRect(prevW,x,w,height)
+				-- block.anchorX = 0
+				-- block.anchorY = 0
+				-- pieceGroup:insert(block)
+				
+				-- local options = 
+				-- {
+					-- --parent = textGroup,
+					-- text = letter,     
+					-- --x = 0,
+					-- --y = 200,
+					-- --width = 128,     --required for multi-line and alignment
+					-- font = TeachersPet,   
+					-- fontSize = 36,
+					-- align = "right"  --new alignment parameter
+				-- }
 
+				-- myText = display.newText( options )
+				-- myText.anchorX =0.5
+				-- myText.anchorY =0.2
+				-- myText:setFillColor(1,0,0)
+				-- myText.x = prevW + 18
+				-- myText.alpha = 1
+				-- pieceGroup:insert(myText)
+				-- pieceGroup.x = xInset*(r+3)
+				-- pieceGroup.y = yInset*3*i
+				-- prevW = prevW + w
+			-- end
+			local options = 
+			{
+				--parent = textGroup,
+				text = pieces[i],     
+				--x = 0,
+				--y = 200,
+				--width = 128,     --required for multi-line and alignment
+				font = TeachersPet,   
+				fontSize = 36,
+				align = "right"  --new alignment parameter
+			}
+
+			myText = display.newText( options )
+			myText.anchorX =0
+			myText.anchorY =0
+			myText.alpha = 1
+			if(i<5)then
+				myText.x = xInset*(r+3)
+				myText.y = yInset*3*i 
+			else
+				myText.x = xInset*(r + 10)
+				myText.y = yInset*3*(i - 5)
+			end
+			myText.pos = i
+			p = i
+			myText:setFillColor( 0, 0, 0 )
+			--myText:rotate( 90 )
+			wordsGroup:insert(myText)
+			
+			myText:addEventListener( "touch", drag )
+		end
+		if(#pieces < 5)then
+			for i=1,#mpieces do
+				local r = math.random(5)
+				local options = 
+				{
+					--parent = textGroup,
+					text = mpieces[i],     
+					--x = 0,
+					--y = 200,
+					--width = 128,     --required for multi-line and alignment
+					font = TeachersPet,   
+					fontSize = 36,
+					align = "right"  --new alignment parameter
+				}
+
+				myText = display.newText( options )
+				myText.anchorX =0
+				myText.anchorY =0
+				myText.alpha = 1
+				myText.x = xInset*(r + 10)
+				myText.y = yInset*3*i
+				--myText.pos = i
+				myText:setFillColor( 0, 0, 0 )
+				--myText:rotate( 90 )
+				wordsGroup:insert(myText)
+				
+				myText:addEventListener( "touch", drag )
+			end	
+		end
+		
+		
+end
 function scene:create( event )
-    local sceneGroup = self.view
+    sceneGroup = self.view
 
     -- Called when the scene's view does not exist
     -- 
@@ -233,50 +483,19 @@ function scene:show( event )
 	    bg.anchorY =0
 	    bg:setFillColor(1)
 	    sceneGroup:insert(bg)
-	    word = getNextWord()
+		menuGroup = display.newGroup()
+		local mCircle = display.newImage("Icon1.png")
+		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
+		menuGroup:insert(mCircle)
+		menuGroup.x =  xInset*2
+		menuGroup.y =  yInset*2
+		menuGroup:addEventListener( "tap", gotoHome )
+		bouGroup:insert(menuGroup)
 		
-		print(word)
-		local s1,s2 = splitDoubleConsonants(word)
-		if(s1 ~= nil and s2 ~= nil)then
-			
-			splitCheck(s1)
-			splitCheck(s2)
-		else
-			--split on first vowel
-			local s1,s2 = splitFirstVowel(word)
-			if(s1 ~= nil and s2 ~= nil)then
-				splitCheck(s1)
-				splitCheck(s2)
-			end
-		end
-		drawLines()
-		for i=1,#pieces do
-			local r = math.random(5)
-			local options = 
-			{
-				--parent = textGroup,
-				text = pieces[i],     
-				--x = 0,
-				--y = 200,
-				--width = 128,     --required for multi-line and alignment
-				font = native.systemFontBold,   
-				fontSize = 36,
-				align = "right"  --new alignment parameter
-			}
-
-			myText = display.newText( options )
-			myText.anchorX =0
-			myText.anchorY =0
-			myText.alpha = 1
-			myText.x = xInset*2*r
-			myText.y = yInset*3*i 
-			myText.pos = i
-			myText:setFillColor( 0, 0, 0 )
-			--myText:rotate( 90 )
-			sceneGroup:insert(myText)
-			myText:addEventListener( "touch", drag )
-		end
-		--sceneGroup:rotate( 90 )
+		Next()
+	    bouGroup:insert( wordsGroup )
+		bouGroup:insert( linesGroup )
+		sceneGroup:insert(bouGroup)
     end 
 end
 
