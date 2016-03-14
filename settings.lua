@@ -64,7 +64,7 @@ function scene:show( event )
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -85,7 +85,7 @@ function scene:show( event )
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 16,
 			align = "right"  --new alignment parameter
 		}
@@ -106,7 +106,7 @@ function scene:show( event )
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -129,7 +129,7 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			local word = list[row.index]
-			-- local rowTitle = display.newText( row,word , 0, 0,TeachersPet, 14 )
+			-- local rowTitle = display.newText( row,word , 0, 0,"TeachersPet", 14 )
 			-- rowTitle:setFillColor( 0 )
 
 			-- Align the label left and vertically centered
@@ -152,7 +152,7 @@ function scene:show( event )
 					--x = 0,
 					--y = 200,
 					--width = 128,     --required for multi-line and alignment
-					font = TeachersPet,   
+					font = "TeachersPet",   
 					fontSize = 20,
 					align = "right"  --new alignment parameter
 				}

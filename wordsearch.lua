@@ -32,8 +32,12 @@ local linegrid = display.newGroup()
 local xInset = display.contentWidth/20
 local yInset = display.contentHeight/20
 local words ={}
+local searchList = {}
 local wordsSearchGroup = display.newGroup()
 local compare ={"a","b","c","d","e"}
+local wordSound
+local wordChannel
+local isPlaying=false
 local function gotoHome(event)
 	transition.to(wordsSearchGroup,{time=1000,x = -display.contentWidth*2,onComplete = function() 
 	composer.gotoScene("menu",{time = 500,effect="fromRight"}) 
@@ -43,8 +47,10 @@ local function gotoHome(event)
 	return true
 end
 local function Next()
+	
+	timer.performWithDelay( 1500, function() 
 	composer.removeScene("wordsearch")
-	timer.performWithDelay( 500, function() composer.gotoScene("wordsearch")end )
+	composer.gotoScene("wordsearch")end )
 	
 end
 local function getNextWord()
@@ -262,6 +268,23 @@ function myTouchListener( event )
 				if(correctCounter == 5)then
 					Next()
 				end
+				local curWord = searchList[correctmask[correctc][correctr]]
+				if(isPlaying)then
+					audio.stop()
+					isPlaying = false
+				end
+				
+				wordSound = audio.loadSound( "sound/graad1/"..curWord.text..".mp3" )
+				wordChannel = audio.play( wordSound )
+				isPlaying = true
+				local length = curWord.contentWidth
+				local height = curWord.contentHeight
+				local rect = display.newRect(curWord.x-5,curWord.y + height/2,length+ 10,3)
+				rect.anchorX =0
+				rect.anchorY = 0.5
+				rect:setFillColor(color[1],color[2],color[3])
+				wordsSearchGroup:insert(rect)
+				print(searchList[correctmask[correctc][correctr]].text .. length)
 				correctCounter = correctCounter + 1
 				correctmask[event.target.c][event.target.r] = 0
 				correctmask[correctc][correctr] = 0
@@ -443,7 +466,7 @@ function scene:show( event )
 				--x = 0,
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 28,
 				align = "center"  --new alignment parameter
 			}
@@ -457,6 +480,7 @@ function scene:show( event )
 			wordgrid:insert(myText)
 			
 			end
+			
 			for w=1,#words do
 				local options = 
 				{
@@ -465,7 +489,7 @@ function scene:show( event )
 					--x = 0,
 					--y = 200,
 					--width = 128,     --required for multi-line and alignment
-					font = TeachersPet,   
+					font = "TeachersPet",   
 					fontSize = 28,
 					align = "center"  --new alignment parameter
 				}
@@ -476,6 +500,7 @@ function scene:show( event )
 				myText.x = display.contentWidth - xInset*4
 				myText.y = yInset*w*2 + yInset*2
 				myText:setFillColor( 0, 0, 0 )
+				searchList[#searchList+1] = myText
 				wordsSearchGroup:insert(myText)
 			end
 	   end

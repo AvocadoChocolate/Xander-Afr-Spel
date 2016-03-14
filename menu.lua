@@ -18,6 +18,9 @@ local k
 local wordTyped =""
 local myText
 local tospell = {}
+local nameText
+local gradeText
+local scoreText
 local counter = 1
 function scene:create( event )
     local sceneGroup = self.view
@@ -106,7 +109,7 @@ function scene:create( event )
 			--x = 0,
 			--y = 200,
 			--width = 62,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -123,7 +126,7 @@ function scene:create( event )
 			--x = 0,
 			--y = 200,
 			--width = 62,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -140,7 +143,7 @@ function scene:create( event )
 			--x = 0,
 			--y = 200,
 			--width = 62,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -157,7 +160,7 @@ function scene:create( event )
 			--x = 0,
 			--y = 200,
 			--width = 62,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -232,7 +235,7 @@ function scene:create( event )
 				--x = 0,
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 20,
 				align = "right"  --new alignment parameter
 			}
@@ -273,10 +276,13 @@ function scene:create( event )
 							val.incorrect = "0"
 							plaersList = {}
 							plaersList[#plaersList+1]=val
-							
+							player = val.name
+							grade = val.grade
+							correct = val.correct
+							incorrect = val.incorrect
 							addAndSavePlayers(plaersList)
-							composer.removeScene("player")
-							composer.gotoScene("player")
+							composer.removeScene("menu")
+							composer.gotoScene("menu")
 						end
 						myText:removeSelf()
 						myText=nil
@@ -307,12 +313,12 @@ function scene:create( event )
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 20,
 				align = "right"  --new alignment parameter
 			}
 			
-			local nameText = display.newText( Nameoptions )
+			 nameText = display.newText( Nameoptions )
 			nameText.anchorX =0.5
 			nameText.anchorY =0.5
 			nameText.x = display.contentWidth/2
@@ -328,12 +334,12 @@ function scene:create( event )
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 16,
 				align = "right"  --new alignment parameter
 			}
 			
-			local gradeText = display.newText( Gradeoptions )
+			 gradeText = display.newText( Gradeoptions )
 			gradeText.anchorX =0.5
 			gradeText.anchorY =0.5
 			gradeText.x = display.contentWidth/2 - xInset*2
@@ -348,12 +354,12 @@ function scene:create( event )
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 16,
 				align = "right"  --new alignment parameter
 			}
 			
-			local scoreText = display.newText( Scoreoptions )
+			 scoreText = display.newText( Scoreoptions )
 			scoreText.anchorX =0.5
 			scoreText.anchorY =0.5
 			scoreText.x = display.contentWidth/2 + xInset*2
@@ -378,7 +384,12 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-        
+        local players = getPlayers()
+		if(players[1]~=nil)then
+			nameText.text =  players[1].name
+			gradeText.text = players[1].grade
+			scoreText.text = players[1].correct .. "/150"
+		end
     end 
 end
 

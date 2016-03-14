@@ -162,7 +162,7 @@ function onScreenKeyboard:new(params)
                    btnBgColor          = {255/255, 51/255, 204/255}                                                  ,
                    btnBgAlpha          = 1                                                         ,
                    btnFgColor          = {1, 1, 1}                                                  ,
-                   btnFontName         = "Arial"                                                        ,
+                   btnFontName         = "TeachersPet"                                                        ,
                    keyBoardMode        = {letters_small = 1, letters_large = 2, numbers = 3, signs = 4} ,
                    maxTextLength       = 0                                                              ,
                    startX              = 10                                                            ,
@@ -397,7 +397,7 @@ function onScreenKeyboard:new(params)
    --backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
    
 
-   local btnText = display.newText(sign, 0, 0, native.systemFont, height/3)
+   local btnText = display.newText(sign, 0, 0, "TeachersPet", height/2)
    btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
    btnText.anchorX = 0.5
    btnText.anchorY = 0.5

@@ -78,7 +78,7 @@ local function onTap(event)
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 72,
 			align = "right"  --new alignment parameter
 		}

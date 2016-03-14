@@ -22,6 +22,7 @@ local correction = false
 local correctionTable = {}
 local wordSound
 local wordChannel
+local isPlaying = false
 -----
 local function gotoHome(event)
 	transition.to(spelGroup,{time=500,y = - display.contentHeight,onComplete = function() 
@@ -69,7 +70,7 @@ local function developerMode()
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -103,7 +104,7 @@ local function drawLines()
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -336,15 +337,13 @@ function scene:create( event )
         --textField = display.newText("",  xInset * 10, yInset * 5, native.systemFont, 50)
         --textField:setTextColor(0,0,0)
         --sceneGroup:insert(textField)
-		drawLines()
-		redrawKeyboard()
+		
+		--keyboard = true
+		
 		spelGroup:insert(linesGroup)
 		print("scene created")
 		sceneGroup:insert(spelGroup)
-		print(keyboard)
-		if(keyboard ~= nil)then
-			redrawKeyboard()
-		end
+	
 		
 end
 
@@ -359,9 +358,9 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
-		if(keyboard == nil)then
-			redrawKeyboard()
-		end
+		drawLines()
+		redrawKeyboard()
+		
 	end
 end
 

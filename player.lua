@@ -60,7 +60,7 @@ function scene:show( event )
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
-			font = TeachersPet,   
+			font = "TeachersPet",   
 			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
@@ -94,21 +94,21 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			if(#plaersList>=1)then
-				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,TeachersPet, 18 )
+				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,"TeachersPet", 18 )
 				rowTitle:setFillColor( 0,0,0,0.5 )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.x = xInset*4
 				rowTitle.y = rowHeight * 0.5
-				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,TeachersPet, 18 )
+				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,"TeachersPet", 18 )
 				rowTitle:setFillColor( 0,0,0,0.5 )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.x = xInset*4
 				rowTitle.y = rowHeight * 0.9
-				local rowTitle = display.newText( row,plaersList[row.index].correct.."/100" , 0, 0,TeachersPet, 14 )
+				local rowTitle = display.newText( row,plaersList[row.index].correct.."/100" , 0, 0,"TeachersPet", 14 )
 				rowTitle:setFillColor( 0,0,0,0.5 )
 
 				--Align the label left and vertically centered
@@ -139,7 +139,7 @@ function scene:show( event )
 						--x = 0,
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
-						font = TeachersPet,   
+						font = "TeachersPet",   
 						fontSize = 20,
 						align = "right"  --new alignment parameter
 					}
@@ -173,7 +173,7 @@ function scene:show( event )
 						--x = 0,
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
-						font = TeachersPet,   
+						font = "TeachersPet",   
 						fontSize = 20,
 						align = "right"  --new alignment parameter
 					}
@@ -193,7 +193,7 @@ function scene:show( event )
 						--x = 0,
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
-						font = TeachersPet,   
+						font = "TeachersPet",   
 						fontSize = 20,
 						align = "right"  --new alignment parameter
 					}
@@ -286,7 +286,7 @@ function scene:show( event )
 				--x = 0,
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
-				font = TeachersPet,   
+				font = "TeachersPet",   
 				fontSize = 20,
 				align = "right"  --new alignment parameter
 			}
