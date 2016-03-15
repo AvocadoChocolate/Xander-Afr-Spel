@@ -27,10 +27,13 @@ local flashGroup = display.newGroup()
 local r = 0
 local function gotoHome(event)
 	--composer.gotoScene("menu")
-	--transition.to(flashGroup,{time=500,x = display.contentWidth,onComplete = function() 
+	if(isPlaying == false)then
+	transition.to(flashGroup,{time=500,x = display.contentWidth,onComplete = function() 
+	
+	transition.to(flashGroup,{time=500,x = 0})
+	end})
 	composer.gotoScene("menu",{time = 500,effect="fromLeft"}) 
-	--transition.to(flashGroup,{time=1500,x = 0})
-	--end})
+	end
 	return true
 end
 local function getNextWord()

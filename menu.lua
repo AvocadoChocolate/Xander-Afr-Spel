@@ -39,23 +39,23 @@ function scene:create( event )
 		local menuGroup = display.newGroup()
 		
 		local function gotoSpel(event)
-			transition.to(menuGroup,{time = 1000,y = display.contentHeight,onComplete=function()  transition.to(menuGroup,{time = 500,y = 0})end})
-			composer.gotoScene("spel",{time=500,effect = "fromTop"})
+			transition.to(menuGroup,{time = 500,y = -2*display.contentHeight,onComplete=function()  transition.to(menuGroup,{time = 500,y = 0})end})
+			composer.gotoScene("spel",{time=500,effect = "fromBottom"})
 			
 			return true
 		end
 		local function gotoBou(event)
-			transition.to(menuGroup,{time = 1000,y =  - display.contentHeight,onComplete=function() transition.to(menuGroup,{time = 500,y = 0})end})
-			composer.gotoScene("bou",{time=500,effect = "fromBottom"})
+			transition.to(menuGroup,{time = 500,y =   2*display.contentHeight,onComplete=function() transition.to(menuGroup,{time = 500,y = 0})end})
+			composer.gotoScene("bou",{time=500,effect = "fromTop"})
 			return true
 		end
 		local function gotoFlash(event)
-			transition.to(menuGroup,{time = 1000,x =  - display.contentWidth,onComplete=function() transition.to(menuGroup,{time = 500,x = 0}) end})
+			transition.to(menuGroup,{time = 500,x =  - 2*display.contentWidth,onComplete=function() transition.to(menuGroup,{time = 500,x = 0}) end})
 			composer.gotoScene("flash",{time=500,effect = "fromRight"})
 			return true
 		end
 		local function gotoWordSearch(event)
-			transition.to(menuGroup,{time = 1000,x =  display.contentWidth,onComplete=function() transition.to(menuGroup,{time = 500,x = 0})end})
+			transition.to(menuGroup,{time = 500,x =  2*display.contentWidth,onComplete=function() transition.to(menuGroup,{time = 500,x = 0})end})
 			composer.gotoScene("wordsearch",{time=500,effect = "fromLeft"})
 			return true
 		end
@@ -72,16 +72,21 @@ function scene:create( event )
 		settingsGroup.x =  xInset*2
 		settingsGroup.y =  yInset*2
 		local function gotoPlayer(event)
-			pCircle:setFillColor(255/255, 51/255, 204/255)
-			transition.to(pCircle,{time = 500,yScale = 50,xScale = 50,onComplete=function()
+			local p = display.newCircle(playersGroup.x,playersGroup.y,20)
+			sceneGroup:insert(p )
+			p:setFillColor(255/255, 51/255, 204/255)
+			transition.to(p,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
 			composer.gotoScene("player") end})
 			
 			return true
 		end
 		local function gotoSettings(event)
-			setCircle:setFillColor( 255/255, 51/255, 204/255 )
-			transition.to(setCircle,{time = 500,yScale = 50,xScale = 50,onComplete=function()
+			local s = display.newCircle(settingsGroup.x,settingsGroup.y,20)
+			s:setFillColor(255/255, 51/255, 204/255)
+			sceneGroup:insert(s)
+			--setCircle:setFillColor( 255/255, 51/255, 204/255 )
+			transition.to(s,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
 			composer.gotoScene("settings") end})
 			return true
@@ -192,12 +197,12 @@ function scene:create( event )
 		bouGroup.anchorX = 0.5
 		bouGroup.anchorY = 0.5
 		bouGroup.x = display.contentWidth/2
-		bouGroup.y = 3*display.contentHeight/4
+		bouGroup.y = display.contentHeight/4+ yInset
 		spelGroup.anchorChildren = true
 		spelGroup.anchorX = 0.5
 		spelGroup.anchorY = 0.5
 		spelGroup.x = display.contentWidth/2
-		spelGroup.y = display.contentHeight/4  + yInset
+		spelGroup.y = 3*display.contentHeight/4  
 		flashGroup:addEventListener( "tap", gotoFlash )
 		spelGroup:addEventListener( "tap", gotoSpel )
 		bouGroup:addEventListener( "tap", gotoBou )
@@ -314,14 +319,14 @@ function scene:create( event )
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 20,
+				fontSize = 28,
 				align = "right"  --new alignment parameter
 			}
 			
-			 nameText = display.newText( Nameoptions )
+			nameText = display.newText( Nameoptions )
 			nameText.anchorX =0.5
 			nameText.anchorY =0.5
-			nameText.x = display.contentWidth/2
+			nameText.x = display.contentWidth/2 - xInset*2
 			nameText.y = yInset
 			nameText.alpha = 1
 			nameText:setFillColor( 0, 0, 0,0.4 )
@@ -335,7 +340,7 @@ function scene:create( event )
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 16,
+				fontSize = 24,
 				align = "right"  --new alignment parameter
 			}
 			
@@ -355,7 +360,7 @@ function scene:create( event )
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 16,
+				fontSize = 28,
 				align = "right"  --new alignment parameter
 			}
 			
@@ -404,7 +409,10 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
-		
+		if(k~=nil)then
+			k:destroy()
+			k = nil
+		end
     end 
 end
 
@@ -416,6 +424,10 @@ function scene:destroy( event )
     -- 
     -- INSERT code here to cleanup the scene
     -- e.g. remove display objects, remove touch listeners, save state, etc
+	if(k~=nil)then
+			k:destroy()
+			k = nil
+	end
 end
 
 ---------------------------------------------------------------------------------

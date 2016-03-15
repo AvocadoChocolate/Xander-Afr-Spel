@@ -39,11 +39,10 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-        local bg = display.newImage("background.png")
+       local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
 	    bg.anchorX =0
 	    bg.anchorY =0
-		bg.x = -xInset*2
-	    bg:setFillColor(1)
+	    bg:setFillColor(255/255, 51/255, 204/255)
 	    sceneGroup:insert(bg)
 		local function gotoHome(event)
 			composer.gotoScene("menu")
@@ -65,7 +64,7 @@ function scene:show( event )
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 20,
+			fontSize = 28,
 			align = "right"  --new alignment parameter
 		}
 
@@ -77,7 +76,12 @@ function scene:show( event )
 		myText.y = yInset
 		myText:setFillColor( 0, 0, 0 ,0.4)
 		sceneGroup:insert(myText)
-		local acc = correct/(incorrect+correct) * 100
+		local acc
+		if(incorrect+correct)==0 then
+			acc = 100
+		else
+			acc = correct/(incorrect+correct) * 100
+		end
 		local options = 
 		{
 			--parent = row,
@@ -86,7 +90,7 @@ function scene:show( event )
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 16,
+			fontSize = 24,
 			align = "right"  --new alignment parameter
 		}
 
@@ -107,7 +111,7 @@ function scene:show( event )
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 20,
+			fontSize = 28,
 			align = "right"  --new alignment parameter
 		}
 

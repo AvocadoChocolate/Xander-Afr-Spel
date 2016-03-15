@@ -39,11 +39,13 @@ local wordSound
 local wordChannel
 local isPlaying=false
 local function gotoHome(event)
-	transition.to(wordsSearchGroup,{time=1000,x = -display.contentWidth*2,onComplete = function() 
-	composer.gotoScene("menu",{time = 500,effect="fromRight"}) 
-	transition.to(wordsSearchGroup,{time=1500,x = 0})
-	end})
+	if isPlaying == false then
+	transition.to(wordsSearchGroup,{time=500,x = -display.contentWidth*2,onComplete = function() 
 	
+	transition.to(wordsSearchGroup,{time=500,x = 0})
+	end})
+	composer.gotoScene("menu",{time = 500,effect="fromRight"}) 
+	end
 	return true
 end
 local function Next()
@@ -118,6 +120,9 @@ local function tryHPlacement()
 			if(matrix[curColumn][r]~=words[counter]:sub(i,i) and matrix[curColumn][r]~=0)then
 				placement = false
 			end
+			if(correctmask[curColumn][r]~=0)then
+				placement = false
+			end
 			r=r+1
 		end		
 		--print(placement)
@@ -151,7 +156,10 @@ local function tryVPlacement()
 		local c = curColumn
 		for i=1,#words[counter] do
 			--print("1: "..matrix[curColumn][curRow].." 2 "..words[counter]:sub(i,i))
-			if(matrix[c][curRow]~=words[counter]:sub(i,i) and matrix[c][curRow]~=0)then
+			if(matrix[c][curRow]~=words[counter]:sub(i,i) and matrix[c][curRow]~=0 )then
+				placement = false
+			end
+			if(correctmask[c][curRow]~=0)then
 				placement = false
 			end
 			c=c+1
@@ -258,6 +266,7 @@ function myTouchListener( event )
 		--linegrid:insert(l)
 		linegrid:insert(circle1)
 		linegrid:insert(line)
+		--display.getCurrentStage():setFocus( linegrid )
        -- print( "touch location in content coordinates = "..event.x..","..event.y )
 	   end
     elseif ( event.phase == "ended" ) then
@@ -266,7 +275,7 @@ function myTouchListener( event )
 			if correctmask[event.target.c][event.target.r]==compare[cor] then
 				--cor = true
 				if(correctCounter == 5)then
-					Next()
+					timer.performWithDelay(2500,function() Next() end)
 				end
 				local curWord = searchList[correctmask[correctc][correctr]]
 				if(isPlaying)then
@@ -366,23 +375,7 @@ function scene:create( event )
     -- 
     -- INSERT code here to initialize the scene
     -- e.g. add display objects to 'sceneGroup', add touch listeners, etc
-end
-
-function scene:show( event )
-    local sceneGroup = self.view
-    local phase = event.phase
-
-    if phase == "will" then
-        -- Called when the scene is still off screen and is about to move on screen
-        
-    elseif phase == "did" then
-        -- Called when the scene is now on screen
-        -- 
-        -- INSERT code here to make the scene come alive
-        -- e.g. start timers, begin animation, play audio, etc
-        
-        -- we obtain the object by id from the scene's object hierarchy
-       local bg = display.newImage("background.png")
+	  local bg = display.newImage("background.png")
 	   bg.anchorX =0
 	   bg.anchorY =0
 	   bg:setFillColor(1)
@@ -419,7 +412,15 @@ function scene:show( event )
 	   end
 	   local str="aaaabbbbbcddddeeeefgggghhhhiiiiijkkkkllllmmmmnnnnoooooppppqrrrrssstttttuuvvvwwwxyyyz"
 	   local checkLetter
-	   
+	   	  local rect = display.newRect(-xInset*2,0,xInset*15,yInset*18)
+		  rect.anchorX = 0
+		  rect.anchorY = 0
+	   rect.alpha = 0
+	   rect.isHitTestable = true
+	   rect.c =  -1
+	   rect.r = -1
+	   rect:addEventListener("touch",myTouchListener)
+	   wordgrid:insert(rect)
 	   --print()
 	   for c = 1,columns do
 			for r = 1,rows do
@@ -481,33 +482,53 @@ function scene:show( event )
 			
 			end
 			
-			for w=1,#words do
-				local options = 
-				{
-					--parent = textGroup,
-					text = words[w],     
-					--x = 0,
-					--y = 200,
-					--width = 128,     --required for multi-line and alignment
-					font = "TeachersPet",   
-					fontSize = 28,
-					align = "center"  --new alignment parameter
-				}
-
-				local myText = display.newText( options )
-				myText.anchorX =0
-				myText.anchorY =0
-				myText.x = display.contentWidth - xInset*4
-				myText.y = yInset*w*2 + yInset*2
-				myText:setFillColor( 0, 0, 0 )
-				searchList[#searchList+1] = myText
-				wordsSearchGroup:insert(myText)
-			end
+			
 	   end
+	   for w=1,#words do
+			local options = 
+			{
+				--parent = textGroup,
+				text = words[w],     
+				--x = 0,
+				--y = 200,
+				--width = 128,     --required for multi-line and alignment
+				font = "TeachersPet",   
+				fontSize = 28,
+				align = "center"  --new alignment parameter
+			}
+
+			local myText = display.newText( options )
+			myText.anchorX =0
+			myText.anchorY =0
+			myText.x = display.contentWidth - xInset*4
+			myText.y = yInset*w*2 + yInset*2
+			myText:setFillColor( 0, 0, 0 )
+			searchList[#searchList+1] = myText
+			wordsSearchGroup:insert(myText)
+		end
+		
 	   wordgrid.y = yInset
 	   wordgrid.x = xInset*3
+
 	   wordsSearchGroup:insert(wordgrid)
 	   sceneGroup:insert(wordsSearchGroup)
+end
+
+function scene:show( event )
+    local sceneGroup = self.view
+    local phase = event.phase
+
+    if phase == "will" then
+        -- Called when the scene is still off screen and is about to move on screen
+        
+    elseif phase == "did" then
+        -- Called when the scene is now on screen
+        -- 
+        -- INSERT code here to make the scene come alive
+        -- e.g. start timers, begin animation, play audio, etc
+        
+        -- we obtain the object by id from the scene's object hierarchy
+     
 	   
     end 
 end

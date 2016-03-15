@@ -62,16 +62,18 @@ local linesGroup = display.newGroup()
 local bouGroup = display.newGroup()
 local wordSound
 local wordChannel
+local isPlaying = false
 local function gotoHome(event)
 	--composer.gotoScene("menu")
-	transition.to(bouGroup,{time=500,y =  display.contentHeight,onComplete = function() 
-	composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
-	transition.to(bouGroup,{time=1500,y = 0,onComplete = function() 
-	
+	if(isPlaying == false)then
+	transition.to(bouGroup,{time=500,y =  -2*display.contentHeight,onComplete = function() 
+	transition.to(bouGroup,{time=500,y =  0,onComplete = function() 
 	
 	end})
-	end})
 	
+	end})
+	composer.gotoScene("menu",{time = 500,effect="fromBottom"}) 
+	end
 	return true
 end
 
@@ -92,8 +94,16 @@ local function getNextWord()
 			end
 		end
 	end
+	
 	word = string.gsub( word, "%-","")
 	word = string.lower( word )
+	if(#prevWords < 5) then
+		prevWords[#prevWords+1] = word
+	else
+		prevWords = {}
+		prevWords[#prevWords+1]= word
+		
+	end
 	return word
 end
 
@@ -257,8 +267,9 @@ local function Next()
 		
 		word = getNextWord()
 		mockWord = getNextWord()
+		isPlaying = true
 		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
-		wordChannel = audio.play( wordSound )
+		wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
 		print(word)
 		local s1,s2 = splitDoubleConsonants(word)
 		
@@ -319,7 +330,7 @@ local function Next()
 					if(counter == #pieces)then
 					
 						
-						timer.performWithDelay(2000,function()
+						timer.performWithDelay(2500,function()
 						wordsGroup:removeSelf()
 						wordsGroup = nil
 						wordsGroup = display.newGroup()

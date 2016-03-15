@@ -25,18 +25,21 @@ local wordChannel
 local isPlaying = false
 -----
 local function gotoHome(event)
-	transition.to(spelGroup,{time=500,y = - display.contentHeight,onComplete = function() 
-	transition.to(spelGroup,{time=1500,y = 0})
-	end})
-	addAndSaveIncorrectWords(list)
-	playersList[1].correct = correct
-	playersList[1].incorrect = incorrect
-	addAndSavePlayers(playersList)
-	if(keyboard~=nil)then
-		keyboard:destroy()
-		keyboard = nil
+	if(isPlaying == false)then
+		transition.to(spelGroup,{time=500,y = 2*display.contentHeight,onComplete = function() 
+		transition.to(spelGroup,{time=500,y = 0})
+		end})
+		composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
+		addAndSaveIncorrectWords(list)
+		playersList[1].correct = correct
+		playersList[1].incorrect = incorrect
+		addAndSavePlayers(playersList)
+		if(keyboard~=nil)then
+			keyboard:destroy()
+			keyboard = nil
+		end
 	end
-	composer.gotoScene("menu",{time = 500,effect="fromBottom"}) 
+	
 	return true
 end
 local function getNextWord()
@@ -47,8 +50,10 @@ local function getNextWord()
 		check = false
 		r = math.random(100)
 		word = gr3.getWord(r)
+		isPlaying = true
 		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
-		wordChannel = audio.play( wordSound )
+		wordChannel = audio.play( wordSound ,{onComplete=function() isPlaying = false end })
+		
 		for i=1,#prevWords do
 			if word == prevWords[i] then
 				check =true

@@ -47,11 +47,10 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-        local bg = display.newImage("background.png")
+        local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
 	    bg.anchorX =0
 	    bg.anchorY =0
-		bg.x = -xInset*2
-	    bg:setFillColor(1)
+	    bg:setFillColor(255/255, 51/255, 204/255)
 	    sceneGroup:insert(bg)
 		local options = 
 		{
@@ -61,7 +60,7 @@ function scene:show( event )
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 20,
+			fontSize = 32,
 			align = "right"  --new alignment parameter
 		}
 
@@ -94,32 +93,32 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			if(#plaersList>=1)then
-				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,"TeachersPet", 18 )
-				rowTitle:setFillColor( 0,0,0,0.5 )
+				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,"TeachersPet", 28 )
+				rowTitle:setFillColor( 1,1,1 )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*4
+				rowTitle.x = xInset*6
 				rowTitle.y = rowHeight * 0.5
-				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,"TeachersPet", 18 )
-				rowTitle:setFillColor( 0,0,0,0.5 )
+				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,"TeachersPet", 24 )
+				rowTitle:setFillColor( 1,1,1 )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*4
+				rowTitle.x = xInset*6
 				rowTitle.y = rowHeight * 0.9
-				local rowTitle = display.newText( row,plaersList[row.index].correct.."/100" , 0, 0,"TeachersPet", 14 )
-				rowTitle:setFillColor( 0,0,0,0.5 )
+				local rowTitle = display.newText( row,plaersList[row.index].correct.."/100" , 0, 0,"TeachersPet", 28 )
+				rowTitle:setFillColor( 1,1,1 )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*8
+				rowTitle.x = xInset*10
 				rowTitle.y = rowHeight *0.5
 				--Draw small pink line
 				local deleteTick = display.newImage(row,"icontick2.png")
-				deleteTick.x = xInset*12
+				deleteTick.x = xInset*16
 				deleteTick.y = rowHeight * 0.5
-				deleteTick:scale(0.5,0.5)
+				deleteTick:scale(0.8,0.8)
 				local function delete(event)
 					local back = display.newRect(0,0,display.contentWidth,display.contentWidth)
 					back.anchorX = 0
