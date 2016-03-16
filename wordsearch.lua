@@ -34,6 +34,7 @@ local yInset = display.contentHeight/20
 local words ={}
 local searchList = {}
 local wordsSearchGroup = display.newGroup()
+local xanderGroup = display.newGroup()
 local compare ={"a","b","c","d","e"}
 local wordSound
 local wordChannel
@@ -224,12 +225,19 @@ function myTouchListener( event )
 		--linegrid:insert(l)
 		linegrid:insert(circle)
 		linegrid:insert(line)
-		
-		if correctmask[event.target.c][event.target.r]~=0 then
-			cor = correctmask[event.target.c][event.target.r]
-			correctc =event.target.c
-			correctr =event.target.r
-			
+		if(correctmask[event.target.c]~=nil)then
+			if correctmask[event.target.c][event.target.r]~=0 then
+				cor = correctmask[event.target.c][event.target.r]
+				correctc =event.target.c
+				correctr =event.target.r
+				
+			end
+		else
+			line:removeSelf()
+			line=nil
+			circle:removeSelf()
+			circle = nil
+			isTouched = false
 		end
         --print( "object touched = "..tostring(event.target) )  -- 'event.target' is the touched object
     elseif ( event.phase == "moved" ) then
@@ -272,32 +280,36 @@ function myTouchListener( event )
     elseif ( event.phase == "ended" ) then
         -- Code executed when the touch lifts off the object
 		if(isTouched)then
-			if correctmask[event.target.c][event.target.r]==compare[cor] then
-				--cor = true
-				if(correctCounter == 5)then
-					timer.performWithDelay(2500,function() Next() end)
+			if(correctmask[event.target.c]~=nil)then
+				if correctmask[event.target.c][event.target.r]==compare[cor] then
+					cor = true
+					if(correctCounter == 5)then
+						timer.performWithDelay(2500,function() Next() end)
+					end
+					local curWord = searchList[correctmask[correctc][correctr]]
+					if(isPlaying)then
+						audio.stop()
+						isPlaying = false
+					end
+					
+					wordSound = audio.loadSound( "sound/graad1/"..curWord.text..".mp3" )
+					wordChannel = audio.play( wordSound )
+					isPlaying = true
+					local length = curWord.contentWidth
+					local height = curWord.contentHeight
+					local rect = display.newRect(curWord.x-5,curWord.y + height/2,length+ 10,3)
+					rect.anchorX =0
+					rect.anchorY = 0.5
+					rect:setFillColor(color[1],color[2],color[3])
+					wordsSearchGroup:insert(rect)
+					print(searchList[correctmask[correctc][correctr]].text .. length)
+					correctCounter = correctCounter + 1
+					correctmask[event.target.c][event.target.r] = 0
+					correctmask[correctc][correctr] = 0
+					r=r+1
+				else
+					cor = false
 				end
-				local curWord = searchList[correctmask[correctc][correctr]]
-				if(isPlaying)then
-					audio.stop()
-					isPlaying = false
-				end
-				
-				wordSound = audio.loadSound( "sound/graad1/"..curWord.text..".mp3" )
-				wordChannel = audio.play( wordSound )
-				isPlaying = true
-				local length = curWord.contentWidth
-				local height = curWord.contentHeight
-				local rect = display.newRect(curWord.x-5,curWord.y + height/2,length+ 10,3)
-				rect.anchorX =0
-				rect.anchorY = 0.5
-				rect:setFillColor(color[1],color[2],color[3])
-				wordsSearchGroup:insert(rect)
-				print(searchList[correctmask[correctc][correctr]].text .. length)
-				correctCounter = correctCounter + 1
-				correctmask[event.target.c][event.target.r] = 0
-				correctmask[correctc][correctr] = 0
-				r=r+1
 			else
 				cor = false
 			end
@@ -380,14 +392,37 @@ function scene:create( event )
 	   bg.anchorY =0
 	   bg:setFillColor(1)
 	   sceneGroup:insert(bg)
-		menuGroup = display.newGroup()
-		local mCircle = display.newImage("Icon1.png")
-		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
-		menuGroup:insert(mCircle)
-		menuGroup.x =  xInset*2
-		menuGroup.y =  yInset*2
-		menuGroup:addEventListener( "tap", gotoHome )
-		wordsSearchGroup:insert(menuGroup)
+		local xander = display.newImage("zander.png")
+		xander.x = display.contentWidth - xInset*2
+		xander.y = display.contentHeight - yInset*0.5
+		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+		xanderGroup:insert(xander)
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*6
+		speechBox.y = display.contentHeight - yInset*2.5
+		speechBox:scale(-xInset*5/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
+		local options = 
+		{
+			--parent = textGroup,
+			text = "Soek die woorder.",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 18,
+			align = "right"  --new alignment parameter
+		}
+
+	    local myText = display.newText( options )
+		myText.anchorY =0.5
+		myText.alpha = 1
+		myText.x = display.contentWidth - xInset*6
+		myText.y = display.contentHeight - yInset*2.5 - 4.5
+		myText:setFillColor( 1, 1, 1 )
+		xanderGroup:insert(myText)
+		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		wordsSearchGroup:insert(xanderGroup)
 		linegrid.y = yInset
 		linegrid.x = xInset*3
 		wordsSearchGroup:insert(linegrid)
@@ -412,7 +447,7 @@ function scene:create( event )
 	   end
 	   local str="aaaabbbbbcddddeeeefgggghhhhiiiiijkkkkllllmmmmnnnnoooooppppqrrrrssstttttuuvvvwwwxyyyz"
 	   local checkLetter
-	   	  local rect = display.newRect(-xInset*2,0,xInset*15,yInset*18)
+	   	  local rect = display.newRect(-xInset*4,-yInset*2,xInset*24,yInset*23)
 		  rect.anchorX = 0
 		  rect.anchorY = 0
 	   rect.alpha = 0
@@ -509,7 +544,14 @@ function scene:create( event )
 		
 	   wordgrid.y = yInset
 	   wordgrid.x = xInset*3
-
+		menuGroup = display.newGroup()
+		local mCircle = display.newImage("Icon1.png")
+		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
+		menuGroup:insert(mCircle)
+		menuGroup.x =  xInset*2
+		menuGroup.y =  yInset*2
+		menuGroup:addEventListener( "tap", gotoHome )
+		wordsSearchGroup:insert(menuGroup)
 	   wordsSearchGroup:insert(wordgrid)
 	   sceneGroup:insert(wordsSearchGroup)
 end

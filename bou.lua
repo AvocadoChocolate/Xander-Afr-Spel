@@ -14,6 +14,7 @@ local scene = composer.newScene( sceneName )
 ---------------------------------------------------------------------------------
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
 local word =""
+local xanderGroup = display.newGroup()
 local vowels = {"a","e","i","o","u","y"}
 local colors ={{51/255, 204/255, 51/255},
 {0/255, 153/255, 255/255},
@@ -179,7 +180,7 @@ local function splitFirstVowel(w)
 end
 local function splitCheck(splitWord)
 	
-	if(string.len(splitWord)<6)then
+	if(string.len(splitWord)<7)then
 		pieces[#pieces+1]=splitWord
 	else
 		local s1,s2 = splitDoubleConsonants(splitWord)
@@ -267,10 +268,11 @@ local function Next()
 		
 		word = getNextWord()
 		mockWord = getNextWord()
+		mock2Word = getNextWord()
 		isPlaying = true
 		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
-		print(word)
+		--print(word)
 		local s1,s2 = splitDoubleConsonants(word)
 		
 		if(s1 ~= nil and s2 ~= nil)then
@@ -299,12 +301,26 @@ local function Next()
 				splitMCheck(m2)
 			end
 		end
+		local m21,m22 = splitDoubleConsonants(mock2Word)
+		if(m21 ~= nil and m22 ~= nil)then
+			
+			splitMCheck(m21)
+			splitMCheck(m22)
+		else
+			--split on first vowel
+			local m21,m22 = splitFirstVowel(mock2Word)
+			if(m21 ~= nil and m22 ~= nil)then
+				splitMCheck(m21)
+				splitMCheck(m22)
+			end
+		end
 		
 		local function drag( event )
 			if event.phase == "began" then
 				collided = false
 				markX = event.target.x    -- store x location of object
 				markY = event.target.y    -- store y location of object
+				
 				display.getCurrentStage():setFocus( event.target )
 			elseif event.phase == "moved" then
 			
@@ -316,16 +332,25 @@ local function Next()
 				event.target.alpha = 1
 				
 				
-				print(event.target.pos)
+				--print(event.target.pos)
 				if(event.target.pos~= nil)then
 					if(hasCollided(event.target,event.target.rectangle))then
 						event.target.alpha = 0
 						tospell[event.target.pos].alpha = 1
 						collided = true
+				
 					end
+				
+					
+				end
+				if(event.x > xInset*15 or event.x < xInset * 5)then
+						transition.to(event.target,{time = 500,x=markX,y=markY})
+					
+				elseif(event.y>yInset*15 or event.y < yInset)then
+						transition.to(event.target,{time = 500,x=markX,y=markY})
 				end
 				display.getCurrentStage():setFocus(nil)
-				--print(#pieces)
+				print(#pieces)
 				if(collided)then
 					if(counter == #pieces)then
 					
@@ -458,7 +483,7 @@ local function Next()
 			
 			pieceGroup:addEventListener( "touch", drag )
 		end
-		if(#pieces < 5)then
+		
 			local pieceGroup = display.newGroup()
 			for i=1,#mpieces do
 				local pieceGroup = display.newGroup()
@@ -504,7 +529,7 @@ local function Next()
 				myText:setFillColor( 0, 0, 0 )
 				--
 				
-				if(c<6)then
+				if(c<5)then
 					c=c+1
 					color =unpack(colors,c)
 				else
@@ -523,7 +548,7 @@ local function Next()
 				canvas[#canvas+1] = rect 
 				pieceGroup:addEventListener( "touch", drag )
 			end	
-		end
+		
 		
 		
 end
@@ -539,6 +564,38 @@ function scene:create( event )
 	    bg.anchorY =0
 	    bg:setFillColor(1)
 	    sceneGroup:insert(bg)
+		
+		local xander = display.newImage("1.png")
+		xander.x = display.contentWidth - xInset*2
+		xander.y = display.contentHeight - yInset*2
+		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+		xanderGroup:insert(xander)
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*5.5
+		speechBox.y = display.contentHeight - yInset*4.5
+		speechBox:scale(-xInset*4/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
+		local options = 
+		{
+			--parent = textGroup,
+			text = "Bou die regte woord.",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 18,
+			align = "right"  --new alignment parameter
+		}
+
+	    local myText = display.newText( options )
+		myText.anchorY =0.5
+		myText.alpha = 1
+		myText.x = display.contentWidth - xInset*5.5
+		myText.y = display.contentHeight - yInset*4.5 - 4.5
+		myText:setFillColor( 1, 1, 1 )
+		xanderGroup:insert(myText)
+		timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		bouGroup:insert(xanderGroup)
 		menuGroup = display.newGroup()
 		local mCircle = display.newImage("Icon1.png")
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
@@ -568,7 +625,10 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-        
+		if(xanderGroup.alpha==0)then
+			xanderGroup.alpha = 1
+			timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		end
     end 
 end
 

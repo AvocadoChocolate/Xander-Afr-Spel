@@ -769,7 +769,8 @@ function onScreenKeyboard:new(params)
 
     --draw the delete button
     local btnGroup = self:createButton("DEL", maxButtonWidth*1.5, maxButtonHeight)
-    btnGroup.x = (8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg -5
+	btnGroup.x =  startXOrg
+   
     btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
     btnGroup.character = "del"
     btnGroup.inputCompleted=false
@@ -836,7 +837,8 @@ function onScreenKeyboard:new(params)
 
     --draw the done button that closes the keyboard
     local btnGroup = self:createButton("OK", maxButtonWidth*1.5, maxButtonHeight)
-    btnGroup.x =  startXOrg--(8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg
+	 btnGroup.x = (8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg -5
+    --(8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg
     btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
     btnGroup.character = "ok"
     btnGroup.inputCompleted=true

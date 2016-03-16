@@ -19,10 +19,10 @@ local counter = 1
 
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
-local plaersList = getPlayers()
+
 ---------------------------------------------------------------------------------
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
-
+local plaersList
 
 function scene:create( event )
     local sceneGroup = self.view
@@ -47,6 +47,7 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
+	    plaersList = getPlayers()
         local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
 	    bg.anchorX =0
 	    bg.anchorY =0
@@ -93,31 +94,48 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			if(#plaersList>=1)then
+				local rowBox = display.newRoundedRect(row,0,0,xInset*14,rowHeight-rowHeight/10,2)
+				rowBox.anchorY = 0
+				rowBox.anchorX = 0
+				rowBox.y = rowHeight/5
+				rowBox.x = xInset*4
+				local function selectPlayer(event)
+					player = plaersList[row.index].name
+					grade =plaersList[row.index].grade
+					correct = plaersList[row.index].correct
+					incorrect = plaersList[row.index].incorrect
+					cur = row.index
+					print(player)
+					composer.gotoScene("menu",{time = 500,effect = "fade"})
+					return true
+				end
+				rowBox:addEventListener("tap",selectPlayer)
 				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,"TeachersPet", 28 )
-				rowTitle:setFillColor( 1,1,1 )
-
+				rowTitle:setFillColor( 0,0,0,0.5 )
+		
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.x = xInset*6
 				rowTitle.y = rowHeight * 0.5
 				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,"TeachersPet", 24 )
-				rowTitle:setFillColor( 1,1,1 )
+				rowTitle:setFillColor( 0,0,0,0.5  )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.x = xInset*6
 				rowTitle.y = rowHeight * 0.9
-				local rowTitle = display.newText( row,plaersList[row.index].correct.."/100" , 0, 0,"TeachersPet", 28 )
-				rowTitle:setFillColor( 1,1,1 )
+				local rowTitle = display.newText( row,plaersList[row.index].correct.."/150" , 0, 0,"TeachersPet", 28 )
+				rowTitle:setFillColor( 0,0,0,0.5)
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.x = xInset*10
-				rowTitle.y = rowHeight *0.5
+				rowTitle.y = rowHeight *0.7
 				--Draw small pink line
+				
 				local deleteTick = display.newImage(row,"icontick2.png")
 				deleteTick.x = xInset*16
-				deleteTick.y = rowHeight * 0.5
+				deleteTick.y = rowHeight * 0.7
 				deleteTick:scale(0.8,0.8)
 				local function delete(event)
 					local back = display.newRect(0,0,display.contentWidth,display.contentWidth)
@@ -222,8 +240,17 @@ function scene:show( event )
 					end
 					no:addEventListener("tap",cancel)
 					local function confirmed(event)
+						local destDir = system.DocumentsDirectory  -- Location where the file is stored
+						local result, reason = os.remove( system.pathForFile( plaersList[row.index].name..".txt", destDir ) )
+
+						if result then
+						   print( "File removed" )
+						else
+						   print( "File does not exist", reason )  --> File does not exist    apple.txt: No such file or directory
+						end
 						table.remove(plaersList,row.index)
 						addAndSavePlayers(plaersList)
+						
 						composer.removeScene("player")
 						composer.gotoScene("player")
 						return true

@@ -35,9 +35,38 @@ function scene:create( event )
 		bg.x = -xInset*2
 	    bg:setFillColor(1)
 	    sceneGroup:insert(bg)
-		
 		local menuGroup = display.newGroup()
 		
+		
+		local xander = display.newImage("2-reverse.png")
+		xander.x = xInset*2
+		xander.y = display.contentHeight - yInset*2
+		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+		menuGroup:insert(xander)
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = xInset*5.5
+		speechBox.y = display.contentHeight - yInset*4.5
+		speechBox:scale(xInset*4/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+		menuGroup:insert(speechBox)
+		local options = 
+		{
+			--parent = textGroup,
+			text = "Kies 'n speletjie.",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 18,
+			align = "right"  --new alignment parameter
+		}
+
+	    local myText = display.newText( options )
+		myText.anchorY =0.5
+		myText.alpha = 1
+		myText.x =xInset*5.5
+		myText.y = display.contentHeight - yInset*4.5 - 4.5
+		myText:setFillColor( 1, 1, 1 )
+		menuGroup:insert(myText)
 		local function gotoSpel(event)
 			transition.to(menuGroup,{time = 500,y = -2*display.contentHeight,onComplete=function()  transition.to(menuGroup,{time = 500,y = 0})end})
 			composer.gotoScene("spel",{time=500,effect = "fromBottom"})
@@ -311,6 +340,7 @@ function scene:create( event )
 			k:drawKeyBoard(k.keyBoardMode.letters_large)
 			
 		else
+			print("Show player details in menu")
 			local Nameoptions = 
 			{
 				--parent = textGroup,
@@ -326,8 +356,8 @@ function scene:create( event )
 			nameText = display.newText( Nameoptions )
 			nameText.anchorX =0.5
 			nameText.anchorY =0.5
-			nameText.x = display.contentWidth/2 - xInset*2
-			nameText.y = yInset
+			nameText.x = display.contentWidth/2 + xInset*2
+			nameText.y = yInset*1.5
 			nameText.alpha = 1
 			nameText:setFillColor( 0, 0, 0,0.4 )
 			--sceneGroup:insert(nameText)
@@ -347,8 +377,8 @@ function scene:create( event )
 			 gradeText = display.newText( Gradeoptions )
 			gradeText.anchorX =0.5
 			gradeText.anchorY =0.5
-			gradeText.x = display.contentWidth/2 - xInset*2
-			gradeText.y = yInset * 2
+			gradeText.x = display.contentWidth/2 + xInset*2
+			gradeText.y = yInset * 2.5
 			gradeText.alpha = 1
 			gradeText:setFillColor( 0, 0, 0,0.4 )
 			menuGroup:insert(gradeText)
@@ -366,9 +396,9 @@ function scene:create( event )
 			
 			 scoreText = display.newText( Scoreoptions )
 			scoreText.anchorX =0.5
-			scoreText.anchorY =0.5
-			scoreText.x = display.contentWidth/2 + xInset*2
-			scoreText.y = yInset * 2
+			scoreText.anchorY =0.75
+			scoreText.x = display.contentWidth/2 + xInset*5
+			scoreText.y = yInset * 2.5
 			scoreText.alpha = 1
 			scoreText:setFillColor( 0, 0, 0,0.4 )
 			menuGroup:insert(scoreText)
@@ -390,10 +420,10 @@ function scene:show( event )
         
         -- we obtain the object by id from the scene's object hierarchy
         local players = getPlayers()
-		if(players[1]~=nil)then
-			nameText.text =  players[1].name
-			gradeText.text = players[1].grade
-			scoreText.text = players[1].correct .. "/150"
+		if(player~="")then
+			nameText.text =  player
+			gradeText.text = grade
+			scoreText.text = correct .. "/150"
 		end
     end 
 end

@@ -24,6 +24,7 @@ local wordSound
 local wordChannel
 local isPlaying =false
 local flashGroup = display.newGroup()
+local xanderGroup = display.newGroup()
 local r = 0
 local function gotoHome(event)
 	--composer.gotoScene("menu")
@@ -73,6 +74,7 @@ local function drawCard()
 	
 end
 local function onTap(event)
+	if(isPlaying==false)then
 	transition.to( cardGroup, { time=200, yScale = 0.01, onComplete=function()
 		local options = 
 		{
@@ -99,15 +101,13 @@ local function onTap(event)
 		cardGroup:insert(cardf)
 		cardGroup:insert(myText)
 		card:setFillColor(1 )
-		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		
-		isPlaying = true
-		wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 		transition.to( cardGroup, { time=200, yScale = 1, onComplete=function()
 			cardGroup:removeEventListener("tap",onTap)
 		end } )
 	end } )
     --cardGroup
+	end
     return true
 end
 local function handleSwipe( event )
@@ -142,6 +142,10 @@ local function handleSwipe( event )
 					word = prevWords[cur]
 				else
 					word = getNextWord()
+					wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+		
+					isPlaying = true
+					wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 					prevWords[#prevWords+1] = word
 				end
 				
@@ -176,9 +180,40 @@ function scene:create( event )
 	 bg = display.newImage("background.png")
 	    bg.anchorX =0
 	    bg.anchorY =0
-		bg.x = -xInset*2
+		--bg.x = -xInset*2
 	    bg:setFillColor(1)
 	    sceneGroup:insert(bg)
+		local xander = display.newImage("2.png")
+		xander.x = display.contentWidth - xInset*2
+		xander.y = yInset*1
+		xander:scale(xInset*3/xander.contentWidth,-xInset*3/xander.contentWidth)
+		xanderGroup:insert(xander)
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*6.5
+		speechBox.y = yInset*3
+		speechBox:scale(-xInset*5/speechBox.contentWidth,-yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
+		local options = 
+		{
+			--parent = textGroup,
+			text = "Kan jy die woord spel?",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 18,
+			align = "right"  --new alignment parameter
+		}
+
+	    local myText = display.newText( options )
+		myText.anchorY =0.5
+		myText.alpha = 1
+		myText.x = display.contentWidth - xInset*6.5
+		myText.y = yInset*3.5 - 4.5
+		myText:setFillColor( 1, 1, 1 )
+		xanderGroup:insert(myText)
+		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		flashGroup:insert(xanderGroup)
 		menuGroup = display.newGroup()
 		local mCircle = display.newImage("Icon1.png")
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
@@ -189,6 +224,9 @@ function scene:create( event )
 		flashGroup:insert(menuGroup)
 		
 	    word = getNextWord()
+		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+		isPlaying = true
+		wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 		prevWords[#prevWords+1] = word
 		cardGroup:addEventListener("tap",onTap)
 		flashGroup:insert(cardGroup)
@@ -213,6 +251,11 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
        
 		--sceneGroup:rotate( 90 )
+		if(isPlaying==false)then
+			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+			isPlaying = true
+			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+		end
     end 
 end
 
@@ -227,7 +270,10 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
-		
+		if(xanderGroup.alpha==0)then
+			xanderGroup.alpha = 1
+			timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		end
     end 
 end
 

@@ -25,31 +25,7 @@ local bg = display.newImage("background.png")
 ----------------------------------------------------------------------------------------------------------
 
 
-function getIncorrectWords()
-	local wordsList = {}
-	-- Path for the file to read
-	local path = system.pathForFile( "userData.txt", system.DocumentsDirectory )
 
-	-- Open the file handle
-	local file, errorString = io.open( path, "r" )
-
-	if not file then
-		-- Error occurred; output the cause
-		print( "File error: " .. errorString )
-	else
-		-- Output lines
-		i = 1
-		for line in file:lines() do
-			wordsList[i] = line
-			i=i+1
-		end
-		-- Close the file handle
-		io.close( file )
-	end
-
-	file = nil
-	return wordsList
-end
 function getPlayers()
 	local playersList = {}
 	-- Path for the file to read
@@ -119,10 +95,25 @@ function addAndSavePlayers(playersList)
 
 	file = nil
 end
+local players = getPlayers()
+if(players[1]==nil)then
+	player = ""
+	grade =""
+	correct = 0
+	incorrect = 0
+	cur = 0
+else
+	player = players[1].name
+	grade =players[1].grade
+	correct = players[1].correct
+	incorrect = players[1].incorrect
+	cur = 1
+end
+composer.gotoScene( "menu" )
 function addAndSaveIncorrectWords(wordsList)
 	
 	-- Path for the file to write
-	local path = system.pathForFile( "userData.txt", system.DocumentsDirectory )
+	local path = system.pathForFile( player..".txt", system.DocumentsDirectory )
 
 	-- Open the file handle
 	local file, errorString = io.open( path, "w" )
@@ -132,26 +123,40 @@ function addAndSaveIncorrectWords(wordsList)
 		print( "File error: " .. errorString )
 	else
 		-- Write data to file
+		
 		for i=1,#wordsList do
 			file:write( wordsList[i] )
 			file:write("\n")
 		end
+	
 		-- Close the file handle
 		io.close( file )
 	end
 
 	file = nil
 end
-local players = getPlayers()
-if(players[1]==nil)then
-	player = ""
-	grade =""
-	correct = 0
-	incorrect = 0
-else
-	player = players[1].name
-	grade =players[1].grade
-	correct = players[1].correct
-	incorrect = players[1].incorrect
+function getIncorrectWords()
+	local wordsList = {}
+	-- Path for the file to read
+	local path = system.pathForFile( player..".txt", system.DocumentsDirectory )
+
+	-- Open the file handle
+	local file, errorString = io.open( path, "r" )
+
+	if not file then
+		-- Error occurred; output the cause
+		print( "File error: " .. errorString )
+	else
+		-- Output lines
+		i = 1
+		for line in file:lines() do
+			wordsList[i] = line
+			i=i+1
+		end
+		-- Close the file handle
+		io.close( file )
+	end
+
+	file = nil
+	return wordsList
 end
-composer.gotoScene( "menu" )

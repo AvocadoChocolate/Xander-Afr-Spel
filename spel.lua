@@ -20,9 +20,11 @@ local spelGroup = display.newGroup()
 local prevWords = {}
 local correction = false
 local correctionTable = {}
+local congrats = {"Fantasties!","Uitstekend!","Puik!"}
 local wordSound
 local wordChannel
 local isPlaying = false
+local xanderGroup = display.newGroup()
 -----
 local function gotoHome(event)
 	if(isPlaying == false)then
@@ -31,8 +33,8 @@ local function gotoHome(event)
 		end})
 		composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
 		addAndSaveIncorrectWords(list)
-		playersList[1].correct = correct
-		playersList[1].incorrect = incorrect
+		playersList[cur].correct = correct
+		playersList[cur].incorrect = incorrect
 		addAndSavePlayers(playersList)
 		if(keyboard~=nil)then
 			keyboard:destroy()
@@ -110,7 +112,7 @@ local function drawLines()
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 20,
+			fontSize = 32,
 			align = "right"  --new alignment parameter
 		}
 
@@ -152,7 +154,47 @@ local function redrawKeyboard()
 							if(Correctioncounter>#correctionTable) then
 								--Get next word
 								print("correct")
-								
+								local x = math.random(4)
+								local y = math.random(3)
+								local xander = display.newImage(x..".png")
+								xander.x = display.contentWidth - xInset*2
+								xander.y = yInset*5
+								xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+								xanderGroup:insert(xander)
+								local speechBox = display.newImage("speechbox.png")
+								speechBox.x = display.contentWidth - xInset*5.5
+								speechBox.y = yInset*3
+								speechBox:scale(-xInset*3/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+								xanderGroup:insert(speechBox)
+								local options = 
+								{
+									--parent = textGroup,
+									text = congrats[y],     
+									--x = 0,
+									--y = 200,
+									--width = 128,     --required for multi-line and alignment
+									font = "TeachersPet",   
+									fontSize = 18,
+									align = "right"  --new alignment parameter
+								}
+
+								local myText = display.newText( options )
+								myText.anchorY =0.5
+								myText.alpha = 1
+								myText.x = display.contentWidth - xInset*5.5
+								myText.y = yInset*3 - 4.5
+								myText:setFillColor( 1, 1, 1 )
+								xanderGroup:insert(myText)
+								timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0,onComplete=function() 
+								xander:removeSelf()
+								xander= nil
+								speechBox:removeSelf()
+								speechBox=nil
+								myText:removeSelf()
+								myText = nil
+								xanderGroup.alpha = 1
+								end})end)
+								spelGroup:insert(xanderGroup)
 								if(#prevWords < 5) then
 									prevWords[#prevWords + 1] = word
 								else
@@ -197,6 +239,47 @@ local function redrawKeyboard()
 							if(wordTyped ==  word) then
 								--Get next word
 								print("correct")
+								local x = math.random(4)
+								local y = math.random(3)
+								local xander = display.newImage(x..".png")
+								xander.x = display.contentWidth - xInset*2
+								xander.y = yInset*5
+								xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+								xanderGroup:insert(xander)
+								local speechBox = display.newImage("speechbox.png")
+								speechBox.x = display.contentWidth - xInset*5.5
+								speechBox.y = yInset*3
+								speechBox:scale(-xInset*3/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+								xanderGroup:insert(speechBox)
+								local options = 
+								{
+									--parent = textGroup,
+									text = congrats[y],     
+									--x = 0,
+									--y = 200,
+									--width = 128,     --required for multi-line and alignment
+									font = "TeachersPet",   
+									fontSize = 18,
+									align = "right"  --new alignment parameter
+								}
+
+								local myText = display.newText( options )
+								myText.anchorY =0.5
+								myText.alpha = 1
+								myText.x = display.contentWidth - xInset*5.5
+								myText.y = yInset*3 - 4.5
+								myText:setFillColor( 1, 1, 1 )
+								xanderGroup:insert(myText)
+								timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0,onComplete=function() 
+								xander:removeSelf()
+								xander= nil
+								speechBox:removeSelf()
+								speechBox=nil
+								myText:removeSelf()
+								myText = nil
+								xanderGroup.alpha = 1
+								end})end)
+								spelGroup:insert(xanderGroup)
 								correct = correct + 1
 								if(#prevWords < 5) then
 									prevWords[#prevWords + 1] = word
@@ -257,7 +340,17 @@ local function redrawKeyboard()
 									end)
 								else
 									--Add word to incorrect words list
-									list[#list+1] = word
+									local alreadyContainsWord = false
+									for i=1,#list do
+										if(word==list[i])then
+											alreadyContainsWord = true
+										end
+									end
+									if(alreadyContainsWord==false)then
+										list[#list+1] = word
+									end
+									
+									
 									
 									keyboard:shakeLetters(correctionTable)
 								end
@@ -326,7 +419,9 @@ function scene:create( event )
 		bg.anchorY =0
 		bg:setFillColor(1)
 		spelGroup:insert(bg)
+		playersList = getPlayers()
 		menuGroup = display.newGroup()
+		
 		local mCircle = display.newImage("Icon1.png")
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)

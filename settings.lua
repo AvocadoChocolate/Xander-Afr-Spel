@@ -14,7 +14,7 @@ local scene = composer.newScene( sceneName )
 
 ---------------------------------------------------------------------------------
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
-local list = getIncorrectWords()
+local list
 
 function scene:create( event )
     local sceneGroup = self.view
@@ -39,6 +39,7 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
+		list = getIncorrectWords()
        local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
 	    bg.anchorX =0
 	    bg.anchorY =0
@@ -80,7 +81,8 @@ function scene:show( event )
 		if(incorrect+correct)==0 then
 			acc = 100
 		else
-			acc = correct/(incorrect+correct) * 100
+			acc = math.round( correct/(incorrect+correct) * 100 )
+			
 		end
 		local options = 
 		{
@@ -146,7 +148,7 @@ function scene:show( event )
 			local linesGroup = display.newGroup()
 			for i=1, wordSize do
 				local dash = display.newLine(i*(xInset),rowHeight * 0.5, i*(xInset) + 15,rowHeight * 0.5)
-				dash:setStrokeColor(255/255, 51/255, 204/255)
+				dash:setStrokeColor(1, 1, 1)
 				dash.strokeWidth = 2
 				linesGroup:insert(dash)
 				local options = 
