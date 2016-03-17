@@ -18,6 +18,7 @@ local rows = 7
 local curRow = 1
 local columns = 7
 local curColumn = 1
+local pcounter = 1
 local correctCounter =1
 local rnum = math.random()
 local rNext =math.random()
@@ -141,6 +142,7 @@ local function tryHPlacement()
 				curRow=curRow+1
 			end
 			counter=counter+1
+			pcounter = pcounter + 1
 		else
 		nextStep()
 		end
@@ -179,6 +181,7 @@ local function tryVPlacement()
 				curColumn=curColumn+1
 			end
 			counter=counter+1
+			pcounter = pcounter + 1
 		else
 		nextStep()
 		end
@@ -255,9 +258,9 @@ function myTouchListener( event )
 			-- c1:removeSelf()
 			-- c1=nil
 		-- end
-		circle1 = display.newCircle(event.x-xInset*3,event.y-yInset/2,16)
+		circle1 = display.newCircle(event.x-xInset*3,event.y-yInset*3/2,16)
 		circle1:setFillColor( color[1],color[2],color[3])
-		line = display.newLine( iX, iY, event.x-xInset*3, event.y-yInset/2 )
+		line = display.newLine( iX, iY, event.x-xInset*3, event.y-yInset*3/2 )
 		line.anchorX =0
 		line.anchorY =0
 		line:setStrokeColor( color[1],color[2],color[3])
@@ -293,7 +296,7 @@ function myTouchListener( event )
 					end
 					
 					wordSound = audio.loadSound( "sound/graad1/"..curWord.text..".mp3" )
-					wordChannel = audio.play( wordSound )
+					wordChannel = audio.play( wordSound,{onComplete= function() isPlaying = false end})
 					isPlaying = true
 					local length = curWord.contentWidth
 					local height = curWord.contentHeight
@@ -423,9 +426,10 @@ function scene:create( event )
 		xanderGroup:insert(myText)
 		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		wordsSearchGroup:insert(xanderGroup)
-		linegrid.y = yInset
+		linegrid.y = yInset*2
 		linegrid.x = xInset*3
 		wordsSearchGroup:insert(linegrid)
+		local er = 1
 	   while(counter~=#words +1)do
 			--print("rNext "..rNext)
 			--print("rnum "..rnum)
@@ -434,16 +438,22 @@ function scene:create( event )
 				--print("next"..rnum)
 				nextStep()
 				
-		   elseif(rnum>0.4) then
+		   elseif(rnum>0.5) then
 				--Place horizontal or vertical
+					
+					--print(pcounter.." 2 H 3 V")
+					
+						tryHPlacement()
 				
-					--print("tryHPlacement"..rnum)
-					tryHPlacement()
 			else
 					--print("tryVPlacement"..rnum)
-					tryVPlacement()
+					--print(pcounter.." 3 H 2 V")
+					
+						tryVPlacement()
+					
 				 
 		   end
+		  
 	   end
 	   local str="aaaabbbbbcddddeeeefgggghhhhiiiiijkkkkllllmmmmnnnnoooooppppqrrrrssstttttuuvvvwwwxyyyz"
 	   local checkLetter
@@ -542,10 +552,11 @@ function scene:create( event )
 			wordsSearchGroup:insert(myText)
 		end
 		
-	   wordgrid.y = yInset
+	   wordgrid.y = yInset*2
 	   wordgrid.x = xInset*3
 		menuGroup = display.newGroup()
-		local mCircle = display.newImage("Icon1.png")
+		local mCircle = display.newImage("home.png")
+		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2
@@ -570,7 +581,7 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-     
+		math.randomseed( os.time() )
 	   
     end 
 end

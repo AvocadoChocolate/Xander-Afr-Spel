@@ -570,11 +570,7 @@ function scene:create( event )
 		xander.y = display.contentHeight - yInset*2
 		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 		xanderGroup:insert(xander)
-		local speechBox = display.newImage("speechbox.png")
-		speechBox.x = display.contentWidth - xInset*5.5
-		speechBox.y = display.contentHeight - yInset*4.5
-		speechBox:scale(-xInset*4/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
-		xanderGroup:insert(speechBox)
+		
 		local options = 
 		{
 			--parent = textGroup,
@@ -586,18 +582,24 @@ function scene:create( event )
 			fontSize = 18,
 			align = "right"  --new alignment parameter
 		}
-
+		
 	    local myText = display.newText( options )
 		myText.anchorY =0.5
 		myText.alpha = 1
-		myText.x = display.contentWidth - xInset*5.5
-		myText.y = display.contentHeight - yInset*4.5 - 4.5
+		myText.x = display.contentWidth - xInset*4.5
+		myText.y = display.contentHeight - yInset*5.5 - 4.5
 		myText:setFillColor( 1, 1, 1 )
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*4.5
+		speechBox.y = display.contentHeight - yInset*5.5
+		speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
 		xanderGroup:insert(myText)
 		timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		bouGroup:insert(xanderGroup)
 		menuGroup = display.newGroup()
-		local mCircle = display.newImage("Icon1.png")
+		local mCircle = display.newImage("home.png")
+		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2
@@ -625,6 +627,7 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
+		math.randomseed( os.time() )
 		if(xanderGroup.alpha==0)then
 			xanderGroup.alpha = 1
 			timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)

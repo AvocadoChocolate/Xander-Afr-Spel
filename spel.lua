@@ -422,7 +422,8 @@ function scene:create( event )
 		playersList = getPlayers()
 		menuGroup = display.newGroup()
 		
-		local mCircle = display.newImage("Icon1.png")
+		local mCircle = display.newImage("home.png")
+		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2
@@ -458,6 +459,7 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
+		math.randomseed( os.time() )
 		drawLines()
 		redrawKeyboard()
 		
@@ -477,7 +479,10 @@ function scene:hide( event )
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
-		
+		if(keyboard~=nil)then
+			keyboard:destroy()
+			keyboard = nil
+		end
 	end	
 	
 end
@@ -489,7 +494,10 @@ function scene:destroy( event )
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
 	local sceneGroup = self.view
-	
+	if(keyboard~=nil)then
+			keyboard:destroy()
+			keyboard = nil
+		end
 end
 
 ---------------------------------------------------------------------------------

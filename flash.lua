@@ -215,7 +215,8 @@ function scene:create( event )
 		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		flashGroup:insert(xanderGroup)
 		menuGroup = display.newGroup()
-		local mCircle = display.newImage("Icon1.png")
+		local mCircle = display.newImage("home.png")
+		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2
@@ -251,6 +252,7 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
        
 		--sceneGroup:rotate( 90 )
+		math.randomseed( os.time() )
 		if(isPlaying==false)then
 			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 			isPlaying = true

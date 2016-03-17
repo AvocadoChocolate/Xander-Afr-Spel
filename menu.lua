@@ -89,21 +89,24 @@ function scene:create( event )
 			return true
 		end
 		local playersGroup = display.newGroup()
-		local pCircle = display.newImage("icon5.png")
+		local pCircle = display.newImage("player.png")
 		--pCircle:setFillColor( 255/255, 51/255, 204/255 )
 		playersGroup:insert(pCircle)
 		playersGroup.x = display.contentWidth - xInset*2
 		playersGroup.y =  yInset*2
+		pCircle:scale(xInset*2/pCircle.width,xInset*2/pCircle.width)
 		local settingsGroup = display.newGroup()
-		local setCircle = display.newImage("IconStat.png")
+		local setCircle = display.newImage("statistics.png")
 		--setCircle:setFillColor( 255/255, 51/255, 204/255 )
 		settingsGroup:insert(setCircle)
 		settingsGroup.x =  xInset*2
 		settingsGroup.y =  yInset*2
+		setCircle:scale(xInset*2/setCircle.width,xInset*2/setCircle.width)
 		local function gotoPlayer(event)
 			local p = display.newCircle(playersGroup.x,playersGroup.y,20)
 			sceneGroup:insert(p )
 			p:setFillColor(255/255, 51/255, 204/255)
+			playersGroup:removeEventListener("tap", gotoPlayer)
 			transition.to(p,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
 			composer.gotoScene("player") end})
@@ -114,6 +117,7 @@ function scene:create( event )
 			local s = display.newCircle(settingsGroup.x,settingsGroup.y,20)
 			s:setFillColor(255/255, 51/255, 204/255)
 			sceneGroup:insert(s)
+			settingsGroup:removeEventListener( "tap", gotoSettings )
 			--setCircle:setFillColor( 255/255, 51/255, 204/255 )
 			transition.to(s,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
@@ -124,10 +128,11 @@ function scene:create( event )
 		local bouGroup = display.newGroup()
 		local wordsearchGroup = display.newGroup()
 		local flashGroup = display.newGroup()
-		
+		timer.performWithDelay(500,function()
 		playersGroup:addEventListener( "tap", gotoPlayer )
 		
 		settingsGroup:addEventListener( "tap", gotoSettings )
+		end)
 		local sCircle = display.newImage("SpelDesign.png")
 		local bCircle = display.newImage("tetris.png")
 		local wCircle = display.newImage("wordsearchIcon.png")
@@ -216,22 +221,22 @@ function scene:create( event )
 		flashGroup.anchorX = 0.5
 		flashGroup.anchorY = 0.5
 		flashGroup.x = display.contentWidth/2 + xInset*4
-		flashGroup.y = display.contentHeight/2
+		flashGroup.y = display.contentHeight/2 - yInset
 		wordsearchGroup.anchorChildren = true
 		wordsearchGroup.anchorX = 0.5
 		wordsearchGroup.anchorY = 0.5
 		wordsearchGroup.x = display.contentWidth/2 - xInset*4
-		wordsearchGroup.y = display.contentHeight/2
+		wordsearchGroup.y = display.contentHeight/2- yInset
 		bouGroup.anchorChildren = true
 		bouGroup.anchorX = 0.5
 		bouGroup.anchorY = 0.5
 		bouGroup.x = display.contentWidth/2
-		bouGroup.y = display.contentHeight/4+ yInset
+		bouGroup.y = display.contentHeight/4
 		spelGroup.anchorChildren = true
 		spelGroup.anchorX = 0.5
 		spelGroup.anchorY = 0.5
 		spelGroup.x = display.contentWidth/2
-		spelGroup.y = 3*display.contentHeight/4  
+		spelGroup.y = 3*display.contentHeight/4  - yInset
 		flashGroup:addEventListener( "tap", gotoFlash )
 		spelGroup:addEventListener( "tap", gotoSpel )
 		bouGroup:addEventListener( "tap", gotoBou )
@@ -315,8 +320,8 @@ function scene:create( event )
 							correct = val.correct
 							incorrect = val.incorrect
 							addAndSavePlayers(plaersList)
-							composer.removeScene("menu")
-							composer.gotoScene("menu")
+							composer.removeScene("menu",{time=500,effect="fade"})
+							composer.gotoScene("menu",{time=500,effect="fade"})
 						end
 						myText:removeSelf()
 						myText=nil
@@ -341,31 +346,64 @@ function scene:create( event )
 			
 		else
 			print("Show player details in menu")
+			local nameCard = display.newImage("front.png")
+			nameCard.x = display.contentWidth - xInset * 4
+			nameCard.y = display.contentHeight - yInset*3
+			nameCard:scale(xInset*6/nameCard.width,yInset*5/nameCard.height)
+			menuGroup:insert(nameCard)
 			local Nameoptions = 
 			{
 				--parent = textGroup,
-				text = player,     
+				text = "Naam:   "..player,     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 28,
+				fontSize = 24,
 				align = "right"  --new alignment parameter
 			}
 			
 			nameText = display.newText( Nameoptions )
-			nameText.anchorX =0.5
-			nameText.anchorY =0.5
-			nameText.x = display.contentWidth/2 + xInset*2
-			nameText.y = yInset*1.5
+			nameText.anchorX =0
+			nameText.anchorY =0
+			nameText.x = display.contentWidth - xInset * 6.5
+			nameText.y = display.contentHeight - yInset*5
 			nameText.alpha = 1
 			nameText:setFillColor( 0, 0, 0,0.4 )
+			local fs = 24
+			
+			while(nameText.contentWidth>(nameCard.contentWidth-24))do
+				
+				fs = fs - 1
+				nameText:removeSelf()
+				nameText = nil
+				local Nameoptions = 
+				{
+					--parent = textGroup,
+					text = "Naam:  "..player,     
+					--x = 0,
+					--y = 200,
+					--width = 62,     --required for multi-line and alignment
+					font = "TeachersPet",   
+					fontSize = fs,
+					align = "right"  --new alignment parameter
+				}
+				
+				nameText = display.newText( Nameoptions )
+				nameText.anchorX =0
+				nameText.anchorY =0
+				nameText.x = display.contentWidth - xInset * 6.5
+				nameText.y = display.contentHeight - yInset*5
+				nameText.alpha = 1
+				nameText:setFillColor( 0, 0, 0,0.4 )
+				nameText.fontSize = fs
+			end
 			--sceneGroup:insert(nameText)
 			menuGroup:insert(nameText)
 			local Gradeoptions = 
 			{
 				--parent = textGroup,
-				text = grade,     
+				text = "Graad:  "..grade,     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
@@ -375,30 +413,30 @@ function scene:create( event )
 			}
 			
 			 gradeText = display.newText( Gradeoptions )
-			gradeText.anchorX =0.5
-			gradeText.anchorY =0.5
-			gradeText.x = display.contentWidth/2 + xInset*2
-			gradeText.y = yInset * 2.5
+			gradeText.anchorX =0
+			gradeText.anchorY =0
+			gradeText.x = display.contentWidth - xInset * 6.5
+			gradeText.y = display.contentHeight - yInset* 3.5
 			gradeText.alpha = 1
 			gradeText:setFillColor( 0, 0, 0,0.4 )
 			menuGroup:insert(gradeText)
 			local Scoreoptions = 
 			{
 				--parent = textGroup,
-				text = correct.."/150",     
+				text = "Punt:     "..correct.." / 150",     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 28,
+				fontSize = 24,
 				align = "right"  --new alignment parameter
 			}
 			
 			 scoreText = display.newText( Scoreoptions )
-			scoreText.anchorX =0.5
-			scoreText.anchorY =0.75
-			scoreText.x = display.contentWidth/2 + xInset*5
-			scoreText.y = yInset * 2.5
+			scoreText.anchorX =0
+			scoreText.anchorY =0
+			scoreText.x = display.contentWidth - xInset * 6.5
+			scoreText.y = display.contentHeight - yInset* 2
 			scoreText.alpha = 1
 			scoreText:setFillColor( 0, 0, 0,0.4 )
 			menuGroup:insert(scoreText)
@@ -421,9 +459,9 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
         local players = getPlayers()
 		if(player~="")then
-			nameText.text =  player
-			gradeText.text = grade
-			scoreText.text = correct .. "/150"
+			nameText.text =  "Naam:  "..player
+			gradeText.text = "Graad:  "..grade
+			scoreText.text = "Punt:     "..correct .. " / 150"
 		end
     end 
 end

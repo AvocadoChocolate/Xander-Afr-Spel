@@ -74,11 +74,13 @@ function scene:show( event )
 		Text:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(Text)
 		local function gotoHome(event)
+			composer.removeScene("player")
 			composer.gotoScene("menu")
 			return true
 		end
 		local menuGroup = display.newGroup()
-		local mCircle = display.newImage("Icon1.png")
+		local mCircle = display.newImage("homeI.png")
+		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2
@@ -94,11 +96,11 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			if(#plaersList>=1)then
-				local rowBox = display.newRoundedRect(row,0,0,xInset*14,rowHeight-rowHeight/10,2)
+				local rowBox = display.newRoundedRect(row,0,0,xInset*18,rowHeight-rowHeight/10,2)
 				rowBox.anchorY = 0
 				rowBox.anchorX = 0
 				rowBox.y = rowHeight/5
-				rowBox.x = xInset*4
+				rowBox.x = xInset
 				local function selectPlayer(event)
 					player = plaersList[row.index].name
 					grade =plaersList[row.index].grade
@@ -110,33 +112,45 @@ function scene:show( event )
 					return true
 				end
 				rowBox:addEventListener("tap",selectPlayer)
-				local rowTitle = display.newText( row,plaersList[row.index].name , 0, 0,"TeachersPet", 28 )
+				local rowTitle = display.newText( row,plaersList[row.index].name, 0, 0,"TeachersPet", 24 )
 				rowTitle:setFillColor( 0,0,0,0.5 )
 		
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*6
+				rowTitle.anchorY = 0
+				rowTitle.x = xInset*2
 				rowTitle.y = rowHeight * 0.5
-				local rowTitle = display.newText( row,plaersList[row.index].grade , 0, 0,"TeachersPet", 24 )
+				local rowTitle = display.newText( row,"Graad: "..plaersList[row.index].grade , 0, 0,"TeachersPet", 24 )
 				rowTitle:setFillColor( 0,0,0,0.5  )
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*6
-				rowTitle.y = rowHeight * 0.9
-				local rowTitle = display.newText( row,plaersList[row.index].correct.."/150" , 0, 0,"TeachersPet", 28 )
+				rowTitle.anchorY = 0
+				rowTitle.x = display.contentWidth/2 - xInset*2
+				rowTitle.y = rowHeight * 0.5
+				local rowTitle = display.newText( row,plaersList[row.index].correct.."/150" , 0, 0,"TeachersPet", 24 )
 				rowTitle:setFillColor( 0,0,0,0.5)
 
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
-				rowTitle.x = xInset*10
-				rowTitle.y = rowHeight *0.7
+				rowTitle.anchorY = 0
+				rowTitle.x = xInset*12
+				rowTitle.y = rowHeight *0.5
 				--Draw small pink line
 				
+				
+				local deleteRect = display.newRoundedRect(row,0,0,xInset* 2,rowHeight-rowHeight/10,0.5)
+				deleteRect.anchorY = 0
+				deleteRect.anchorX = 0
+				deleteRect.x = display.contentWidth - xInset* 3
+				deleteRect.y = rowHeight/5
+				deleteRect:setFillColor(239/255,74/255,81/255)
 				local deleteTick = display.newImage(row,"icontick2.png")
-				deleteTick.x = xInset*16
+				
+				deleteTick.x = display.contentWidth - xInset* 2
 				deleteTick.y = rowHeight * 0.7
 				deleteTick:scale(0.8,0.8)
+				
 				local function delete(event)
 					local back = display.newRect(0,0,display.contentWidth,display.contentWidth)
 					back.anchorX = 0
@@ -259,14 +273,14 @@ function scene:show( event )
 					yes:addEventListener("tap",confirmed)
 					return true
 				end
-				deleteTick:addEventListener("tap",delete)
+				deleteRect:addEventListener("tap",delete)
 			end
 		end
 		-- Create the widget
 		local tableView = widget.newTableView(
 			{
 				--left = 200,
-				top = yInset*3,
+				top = yInset*3.5,
 				height = display.contentHeight - yInset*6,
 				width = display.contentWidth,
 				onRowRender = onRowRender,
@@ -348,7 +362,7 @@ function scene:show( event )
 						if(myText.text~="Enter Player Name")then
 							local val = {}
 							val.name =myText.text
-							val.grade ="Graad 1"
+							val.grade ="1"
 							val.correct ="0"
 							val.incorrect = "0"
 							plaersList[#plaersList+1]=val
@@ -382,9 +396,30 @@ function scene:show( event )
 			return true
 		end
 		menuGroup = display.newGroup()
-		local mCircle = display.newCircle(0,0,28)
-		mCircle:setFillColor( 255/255, 51/255, 204/255 )
-		menuGroup:insert(mCircle)
+		--local mCircle = display.newCircle(0,0,28)
+		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
+		local addPlayerButtton =  display.newRoundedRect(0,0,xInset*6,yInset*2,2)
+		local options = 
+		{
+			--parent = row,
+			text = "Nuwe Speler",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 20,
+			align = "right"  --new alignment parameter
+		}
+
+		local myText = display.newText( options )
+		myText.anchorX =0.5
+		myText.anchorY =0.5
+		myText.alpha = 1
+		--myText.x = display.contentWidth  / 2
+		--myText.y = display.contentHeight - yInset*14 + 10
+		myText:setFillColor( 0, 0, 0,0.7 )
+		menuGroup:insert(addPlayerButtton)
+		menuGroup:insert(myText)
 		menuGroup.x =  display.contentWidth / 2
 		menuGroup.y =  display.contentHeight - yInset*2
 		menuGroup:addEventListener( "tap", addPlayer )
