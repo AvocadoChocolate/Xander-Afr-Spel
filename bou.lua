@@ -64,9 +64,15 @@ local bouGroup = display.newGroup()
 local wordSound
 local wordChannel
 local isPlaying = false
+local wordComplete = false
 local function gotoHome(event)
 	--composer.gotoScene("menu")
-	if(isPlaying == false)then
+	
+	print(isPlaying)
+	if(isPlaying == false and wordComplete==false)then
+	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(menuGroup,{time = 100, alpha = 1})
+			end})
 	transition.to(bouGroup,{time=500,y =  -2*display.contentHeight,onComplete = function() 
 	transition.to(bouGroup,{time=500,y =  0,onComplete = function() 
 	
@@ -270,8 +276,12 @@ local function Next()
 		mockWord = getNextWord()
 		mock2Word = getNextWord()
 		isPlaying = true
+		
+		timer.performWithDelay(500,function()
 		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
+		wordComplete = false
+		end)
 		--print(word)
 		local s1,s2 = splitDoubleConsonants(word)
 		
@@ -355,6 +365,7 @@ local function Next()
 					if(counter == #pieces)then
 					
 						
+						wordComplete = true
 						timer.performWithDelay(2500,function()
 						wordsGroup:removeSelf()
 						wordsGroup = nil
@@ -364,7 +375,9 @@ local function Next()
 						mpieces ={}
 						tospell = {}
 						canvas ={}
+						--isPlaying = true
 						Next()
+						--isPlaying = true
 						end)
 						
 						
@@ -606,6 +619,23 @@ function scene:create( event )
 		menuGroup.y =  yInset*2
 		menuGroup:addEventListener( "tap", gotoHome )
 		bouGroup:insert(menuGroup)
+		local soundButton = display.newImage("Sound.png")
+		soundButton:scale(xInset*2/soundButton.width,xInset*2/soundButton.width)
+		soundButton.x = xInset*2
+		soundButton.y = display.contentHeight - yInset*2
+		local function playWord(event)
+			transition.to(soundButton,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(soundButton,{time = 100, alpha = 1})
+			end})
+			if(isPlaying==false)then
+				wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+				isPlaying = true
+				wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+			end
+		end
+		
+		soundButton:addEventListener("tap",playWord)
+		bouGroup:insert(soundButton)
 		
 		Next()
 	    bouGroup:insert( wordsGroup )
@@ -631,6 +661,13 @@ function scene:show( event )
 		if(xanderGroup.alpha==0)then
 			xanderGroup.alpha = 1
 			timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
+		end
+		if(isPlaying==false)then
+			timer.performWithDelay(500,function()
+			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+			isPlaying = true
+			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+			end)
 		end
     end 
 end

@@ -76,7 +76,7 @@ function scene:show( event )
 		myText.alpha = 1
 		myText.x = display.contentWidth  / 2
 		myText.y = yInset
-		myText:setFillColor( 0, 0, 0 ,0.4)
+		myText:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(myText)
 		local acc
 		if(incorrect+correct)==0 then
@@ -103,7 +103,7 @@ function scene:show( event )
 		myText.alpha = 1
 		myText.x = display.contentWidth  / 2
 		myText.y = yInset*3
-		myText:setFillColor( 0, 0, 0,0.4 )
+		myText:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(myText)
 		
 		local options = 

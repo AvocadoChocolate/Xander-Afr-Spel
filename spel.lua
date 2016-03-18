@@ -28,6 +28,9 @@ local xanderGroup = display.newGroup()
 -----
 local function gotoHome(event)
 	if(isPlaying == false)then
+	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(menuGroup,{time = 100, alpha = 1})
+			end})
 		transition.to(spelGroup,{time=500,y = 2*display.contentHeight,onComplete = function() 
 		transition.to(spelGroup,{time=500,y = 0})
 		end})
@@ -53,8 +56,10 @@ local function getNextWord()
 		r = math.random(100)
 		word = gr3.getWord(r)
 		isPlaying = true
+		timer.performWithDelay(500,function()
 		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete=function() isPlaying = false end })
+		end)
 		
 		for i=1,#prevWords do
 			if word == prevWords[i] then
@@ -161,11 +166,7 @@ local function redrawKeyboard()
 								xander.y = yInset*5
 								xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 								xanderGroup:insert(xander)
-								local speechBox = display.newImage("speechbox.png")
-								speechBox.x = display.contentWidth - xInset*5.5
-								speechBox.y = yInset*3
-								speechBox:scale(-xInset*3/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
-								xanderGroup:insert(speechBox)
+								
 								local options = 
 								{
 									--parent = textGroup,
@@ -181,9 +182,14 @@ local function redrawKeyboard()
 								local myText = display.newText( options )
 								myText.anchorY =0.5
 								myText.alpha = 1
-								myText.x = display.contentWidth - xInset*5.5
+								myText.x = display.contentWidth - xInset*5
 								myText.y = yInset*3 - 4.5
 								myText:setFillColor( 1, 1, 1 )
+								local speechBox = display.newImage("speechbox.png")
+								speechBox.x = display.contentWidth - xInset*5
+								speechBox.y = yInset*3
+								speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+								xanderGroup:insert(speechBox)
 								xanderGroup:insert(myText)
 								timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0,onComplete=function() 
 								xander:removeSelf()
@@ -231,6 +237,12 @@ local function redrawKeyboard()
 								tospell[counter].text =""
 								wordTyped = wordTyped:sub(1,string.len(wordTyped)-1)
 							end
+						elseif(event.key == "sound")then
+							if(isPlaying==false)then
+								wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+								isPlaying = true
+								wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+							end
 						else
 						tospell[counter].text=keyboard:getText() --update the textfield with the current text of the keyboard
 						wordTyped = wordTyped .. tospell[counter].text
@@ -246,11 +258,7 @@ local function redrawKeyboard()
 								xander.y = yInset*5
 								xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 								xanderGroup:insert(xander)
-								local speechBox = display.newImage("speechbox.png")
-								speechBox.x = display.contentWidth - xInset*5.5
-								speechBox.y = yInset*3
-								speechBox:scale(-xInset*3/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
-								xanderGroup:insert(speechBox)
+								
 								local options = 
 								{
 									--parent = textGroup,
@@ -266,9 +274,14 @@ local function redrawKeyboard()
 								local myText = display.newText( options )
 								myText.anchorY =0.5
 								myText.alpha = 1
-								myText.x = display.contentWidth - xInset*5.5
+								myText.x = display.contentWidth - xInset*5
 								myText.y = yInset*3 - 4.5
 								myText:setFillColor( 1, 1, 1 )
+								local speechBox = display.newImage("speechbox.png")
+								speechBox.x = display.contentWidth - xInset*5
+								speechBox.y = yInset*3
+								speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+								xanderGroup:insert(speechBox)
 								xanderGroup:insert(myText)
 								timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0,onComplete=function() 
 								xander:removeSelf()
@@ -379,7 +392,7 @@ local function redrawKeyboard()
         keyboard:drawKeyBoard(keyboard.keyBoardMode.letters_small)
 		
 		
-		local enable = {"del"}
+		local enable = {"del","sound"}
 		for i=1,string.len(word) do
 			local alreadyContains = false
 			for l=1,#enable do
@@ -462,7 +475,13 @@ function scene:show( event )
 		math.randomseed( os.time() )
 		drawLines()
 		redrawKeyboard()
-		
+		if(isPlaying==false)then
+			timer.performWithDelay(500,function()
+			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+			isPlaying = true
+			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+			end)
+		end
 	end
 end
 

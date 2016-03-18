@@ -48,6 +48,7 @@ function scene:show( event )
         
         -- we obtain the object by id from the scene's object hierarchy
 	    plaersList = getPlayers()
+	
         local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
 	    bg.anchorX =0
 	    bg.anchorY =0
@@ -144,7 +145,7 @@ function scene:show( event )
 				deleteRect.anchorX = 0
 				deleteRect.x = display.contentWidth - xInset* 3
 				deleteRect.y = rowHeight/5
-				deleteRect:setFillColor(239/255,74/255,81/255)
+				deleteRect:setFillColor(0.8)
 				local deleteTick = display.newImage(row,"icontick2.png")
 				
 				deleteTick.x = display.contentWidth - xInset* 2
@@ -163,6 +164,13 @@ function scene:show( event )
 					end
 					back:addEventListener("tap",block)
 					sceneGroup:insert(back)
+					local xander = display.newImage("2-reverse.png")
+					xander.x = display.contentWidth  / 2 - xInset * 2
+					xander.y = display.contentHeight - yInset*12
+					xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+					sceneGroup:insert(xander)
+					
+					
 					local options = 
 					{
 						--parent = row,
@@ -171,17 +179,22 @@ function scene:show( event )
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
 						font = "TeachersPet",   
-						fontSize = 20,
-						align = "right"  --new alignment parameter
+						fontSize = 28,
+						align = "left"  --new alignment parameter
 					}
-
+					
 					confirmText = display.newText( options )
-					confirmText.anchorX =0.5
-					confirmText.anchorY =0
+					--confirmText.anchorX =0.5
+					--confirmText.anchorY =0
 					confirmText.alpha = 1
-					confirmText.x = display.contentWidth  / 2
-					confirmText.y = display.contentHeight - yInset*14 + 10
+					confirmText.x = display.contentWidth  / 2 + xInset * 3
+					confirmText.y = display.contentHeight - yInset*15 - 10
 					confirmText:setFillColor( 1, 1, 1 )
+					local speechBox = display.newImage("speechbox.png")
+					speechBox.x = display.contentWidth  / 2 + xInset * 3
+					speechBox.y = display.contentHeight - yInset*15
+					speechBox:scale((confirmText.width+20)/speechBox.contentWidth,(confirmText.height+25)/speechBox.contentHeight)
+					sceneGroup:insert(speechBox)
 					sceneGroup:insert(confirmText)
 					local yes  = display.newRoundedRect(display.contentWidth / 2 - xInset*2 - 5,display.contentHeight - yInset*8,xInset*2,yInset*2,4)
 					yes.anchorX = 0.5
@@ -205,7 +218,7 @@ function scene:show( event )
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
 						font = "TeachersPet",   
-						fontSize = 20,
+						fontSize = 28,
 						align = "right"  --new alignment parameter
 					}
 
@@ -225,7 +238,7 @@ function scene:show( event )
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment
 						font = "TeachersPet",   
-						fontSize = 20,
+						fontSize = 28,
 						align = "right"  --new alignment parameter
 					}
 
@@ -250,6 +263,10 @@ function scene:show( event )
 						yesText = nil
 						noText:removeSelf()
 						noText = nil
+						xander:removeSelf()
+						xander = nil
+						speechBox:removeSelf()
+						speechBox=nil
 						return true
 					end
 					no:addEventListener("tap",cancel)
@@ -264,7 +281,6 @@ function scene:show( event )
 						end
 						table.remove(plaersList,row.index)
 						addAndSavePlayers(plaersList)
-						
 						composer.removeScene("player")
 						composer.gotoScene("player")
 						return true
@@ -366,7 +382,11 @@ function scene:show( event )
 							val.correct ="0"
 							val.incorrect = "0"
 							plaersList[#plaersList+1]=val
-							
+							player = myText.text
+							grade = "1"
+							correct ="0"
+							incorrect ="0"
+							cur = #plaersList
 							addAndSavePlayers(plaersList)
 							composer.removeScene("player")
 							composer.gotoScene("player")
@@ -431,7 +451,9 @@ function scene:show( event )
 		--show a k with small printed letters as default. Read more about the possible values for k types in the section "possible k types"
 		
 		--timer.performWithDelay(500,function() k:hide() end)
-		
+		if(plaersList[1] == nil)then
+			addPlayer()
+		end
     end 
 end
 

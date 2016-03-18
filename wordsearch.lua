@@ -42,6 +42,9 @@ local wordChannel
 local isPlaying=false
 local function gotoHome(event)
 	if isPlaying == false then
+	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(menuGroup,{time = 100, alpha = 1})
+			end})
 	transition.to(wordsSearchGroup,{time=500,x = -display.contentWidth*2,onComplete = function() 
 	
 	transition.to(wordsSearchGroup,{time=500,x = 0})
@@ -396,19 +399,15 @@ function scene:create( event )
 	   bg:setFillColor(1)
 	   sceneGroup:insert(bg)
 		local xander = display.newImage("zander.png")
-		xander.x = display.contentWidth - xInset*2
+		xander.x = display.contentWidth - xInset
 		xander.y = display.contentHeight - yInset*0.5
 		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 		xanderGroup:insert(xander)
-		local speechBox = display.newImage("speechbox.png")
-		speechBox.x = display.contentWidth - xInset*6
-		speechBox.y = display.contentHeight - yInset*2.5
-		speechBox:scale(-xInset*5/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
-		xanderGroup:insert(speechBox)
+		
 		local options = 
 		{
 			--parent = textGroup,
-			text = "Soek die woorder.",     
+			text = "Soek die woorde.",     
 			--x = 0,
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
@@ -420,9 +419,14 @@ function scene:create( event )
 	    local myText = display.newText( options )
 		myText.anchorY =0.5
 		myText.alpha = 1
-		myText.x = display.contentWidth - xInset*6
-		myText.y = display.contentHeight - yInset*2.5 - 4.5
+		myText.x = display.contentWidth - xInset*3
+		myText.y = display.contentHeight - yInset*5 - 4.5
 		myText:setFillColor( 1, 1, 1 )
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*3
+		speechBox.y = display.contentHeight - yInset*5
+		speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
 		xanderGroup:insert(myText)
 		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		wordsSearchGroup:insert(xanderGroup)

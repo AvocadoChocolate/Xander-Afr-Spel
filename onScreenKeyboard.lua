@@ -396,21 +396,41 @@ function onScreenKeyboard:new(params)
    end
    --backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
    
-
-   local btnText = display.newText(sign, 0, 0, "TeachersPet", height/2)
-   btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
-   btnText.anchorX = 0.5
-   btnText.anchorY = 0.5
-   --btnText:setReferencePoint(display.CenterReferencePoint)
-   btnText.x = initX + backGround.width/2
-   btnText.y = initY + backGround.height/2
-   buttonGroup:insert(btnText)
-	
-   --Make sure that the text is not larger than the surrounding background
-   while(btnText.width > backGround.width or btnText.width > backGround.height) do
-    btnText.size= btnText.size-1
-   end
-
+	if(sign~="DEL" and sign~="SOUND")then
+	   local btnText = display.newText(sign, 0, 0, "TeachersPet", height/2)
+	   btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
+	   btnText.anchorX = 0.5
+	   btnText.anchorY = 0.5
+	   --btnText:setReferencePoint(display.CenterReferencePoint)
+	   btnText.x = initX + backGround.width/2
+	   btnText.y = initY + backGround.height/2
+	   buttonGroup:insert(btnText)
+		
+	   --Make sure that the text is not larger than the surrounding background
+	   while(btnText.width > backGround.width or btnText.width > backGround.height) do
+		btnText.size= btnText.size-1
+	   end
+	elseif(sign=="DEL")then
+		local btnText = display.newImage("backarrow.png")
+	   --btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
+	   btnText.anchorX = 0.5
+	   btnText.anchorY = 0.5
+	   --btnText:setReferencePoint(display.CenterReferencePoint)
+	   btnText.x = initX + backGround.width/2
+	   btnText.y = initY + backGround.height/2
+	   btnText:scale(0.3,0.3)
+	   buttonGroup:insert(btnText)
+	elseif(sign=="SOUND")then
+	   local btnText = display.newImage("luister.png")
+	   --btnText:setTextColor(self.btnFgColor[1], self.btnFgColor[2], self.btnFgColor[3])
+	   btnText.anchorX = 0.5
+	   btnText.anchorY = 0.5
+	   --btnText:setReferencePoint(display.CenterReferencePoint)
+	   btnText.x = initX + backGround.width/2
+	   btnText.y = initY + backGround.height/2
+	   btnText:scale(0.3,0.3)
+	   buttonGroup:insert(btnText)
+	end
   
 
    --buttonGroup.alpha = self.btnBgAlpha
@@ -609,13 +629,22 @@ function onScreenKeyboard:new(params)
     btnGroup:addEventListener("touch", deleteSign)
     self.displayGroup:insert(btnGroup)
 
-    totalRows    = totalRows +1
-    buttonsOfRow = 0
+   -- totalRows    = totalRows +1
+   -- buttonsOfRow = 0
 
     --call the user defined listener for the key touch events
     btnGroup:addEventListener("touch", self.userListenerCaller)
 
+	local btnGroup = self:createButton("SOUND", maxButtonWidth*1.5, maxButtonHeight)
+	 btnGroup.x = startXOrg
+    --(8.5 * maxButtonWidth + ((firstRowLength-1) * self.keySpace)) + startXOrg
+    btnGroup.y = self.startY + (maxButtonHeight*totalRows) + (totalRows * self.keySpace)
+    btnGroup.character = "sound"
+    --btnGroup.inputCompleted=true
+    self.displayGroup:insert(btnGroup)
 
+    --call the user defined listener for the key touch events
+    btnGroup:addEventListener("touch", self.userListenerCaller)
 
     --draw the keyboard switch button
     -- local btnGroup = self:createButton("123...", maxButtonWidth*1.5+self.keySpace, maxButtonHeight)

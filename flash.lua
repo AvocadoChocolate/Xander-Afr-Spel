@@ -28,7 +28,11 @@ local xanderGroup = display.newGroup()
 local r = 0
 local function gotoHome(event)
 	--composer.gotoScene("menu")
+	
 	if(isPlaying == false)then
+	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(menuGroup,{time = 100, alpha = 1})
+			end})
 	transition.to(flashGroup,{time=500,x = display.contentWidth,onComplete = function() 
 	
 	transition.to(flashGroup,{time=500,x = 0})
@@ -142,10 +146,12 @@ local function handleSwipe( event )
 					word = prevWords[cur]
 				else
 					word = getNextWord()
+					timer.performWithDelay(500,function()
 					wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		
 					isPlaying = true
 					wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+					end)
 					prevWords[#prevWords+1] = word
 				end
 				
@@ -188,11 +194,7 @@ function scene:create( event )
 		xander.y = yInset*1
 		xander:scale(xInset*3/xander.contentWidth,-xInset*3/xander.contentWidth)
 		xanderGroup:insert(xander)
-		local speechBox = display.newImage("speechbox.png")
-		speechBox.x = display.contentWidth - xInset*6.5
-		speechBox.y = yInset*3
-		speechBox:scale(-xInset*5/speechBox.contentWidth,-yInset*2/speechBox.contentHeight)
-		xanderGroup:insert(speechBox)
+		
 		local options = 
 		{
 			--parent = textGroup,
@@ -211,6 +213,11 @@ function scene:create( event )
 		myText.x = display.contentWidth - xInset*6.5
 		myText.y = yInset*3.5 - 4.5
 		myText:setFillColor( 1, 1, 1 )
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*6.5
+		speechBox.y = yInset*3
+		speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,-yInset*2/speechBox.contentHeight)
+		xanderGroup:insert(speechBox)
 		xanderGroup:insert(myText)
 		timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		flashGroup:insert(xanderGroup)
@@ -225,9 +232,11 @@ function scene:create( event )
 		flashGroup:insert(menuGroup)
 		
 	    word = getNextWord()
-		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		isPlaying = true
+		timer.performWithDelay(500,function()
+		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+		end)
 		prevWords[#prevWords+1] = word
 		cardGroup:addEventListener("tap",onTap)
 		flashGroup:insert(cardGroup)
@@ -254,9 +263,11 @@ function scene:show( event )
 		--sceneGroup:rotate( 90 )
 		math.randomseed( os.time() )
 		if(isPlaying==false)then
+			timer.performWithDelay(500,function()
 			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
 			isPlaying = true
 			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+			end)
 		end
     end 
 end
