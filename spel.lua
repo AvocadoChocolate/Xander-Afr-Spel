@@ -1,6 +1,8 @@
 local composer = require( "composer" )
 require("onScreenKeyboard") -- include the onScreenKeyboard.lua file
 local gr3 = require("gr1")
+local gr1Total = 150
+local gr2Total = 300
 local scene = composer.newScene()
 local keyboard
 local myText
@@ -36,6 +38,7 @@ local function gotoHome(event)
 		end})
 		composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
 		addAndSaveIncorrectWords(list)
+		playersList[cur].grade = grade
 		playersList[cur].correct = correct
 		playersList[cur].incorrect = incorrect
 		addAndSavePlayers(playersList)
@@ -293,7 +296,17 @@ local function redrawKeyboard()
 								xanderGroup.alpha = 1
 								end})end)
 								spelGroup:insert(xanderGroup)
-								correct = correct + 1
+								correct = correct + 
+								if(grade == 1)then
+									if(correct>gr1Total)then
+										grade = 2
+										correct = 0
+									end
+								else
+									if(correct>gr2Total)then
+										correct = gr2Total
+									end
+								end
 								if(#prevWords < 5) then
 									prevWords[#prevWords + 1] = word
 								else
@@ -502,6 +515,11 @@ function scene:hide( event )
 			keyboard:destroy()
 			keyboard = nil
 		end
+		addAndSaveIncorrectWords(list)
+		playersList[cur].grade = grade
+		playersList[cur].correct = correct
+		playersList[cur].incorrect = incorrect
+		addAndSavePlayers(playersList)
 	end	
 	
 end
@@ -517,6 +535,11 @@ function scene:destroy( event )
 			keyboard:destroy()
 			keyboard = nil
 		end
+	addAndSaveIncorrectWords(list)
+	playersList[cur].grade = grade
+	playersList[cur].correct = correct
+	playersList[cur].incorrect = incorrect
+	addAndSavePlayers(playersList)
 end
 
 ---------------------------------------------------------------------------------
