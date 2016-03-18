@@ -310,7 +310,7 @@ function scene:create( event )
 						if(myText.text~="Enter Player Name")then
 							local val = {}
 							val.name =myText.text
-							val.grade ="Graad 1"
+							val.grade ="1"
 							val.correct ="0"
 							val.incorrect = "0"
 							plaersList = {}

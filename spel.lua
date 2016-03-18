@@ -301,7 +301,7 @@ local function redrawKeyboard()
 								xanderGroup.alpha = 1
 								end})end)
 								spelGroup:insert(xanderGroup)
-								correct = correct + 
+								correct = correct + 1
 								if(grade == 1)then
 									if(correct>gr1Total)then
 										grade = 2

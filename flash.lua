@@ -154,7 +154,7 @@ local function handleSwipe( event )
 				else
 					word = getNextWord()
 					timer.performWithDelay(500,function()
-					wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
+					wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
 		
 					isPlaying = true
 					wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
@@ -241,7 +241,7 @@ function scene:create( event )
 	    word = getNextWord()
 		isPlaying = true
 		timer.performWithDelay(500,function()
-		wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
+		wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 		end)
 		prevWords[#prevWords+1] = word
