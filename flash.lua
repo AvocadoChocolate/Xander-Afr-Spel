@@ -7,7 +7,13 @@
 local sceneName = ...
 
 local composer = require( "composer" )
-local gr3 = require("gr1")
+local gr3
+if(grade == "1")then
+gr3 = require("gr1")
+else
+gr3 = require("gr2")
+end
+local grTotal = gr3.total()
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
 
@@ -48,6 +54,7 @@ local function getNextWord()
 	while(check)do
 		check = false
 		r = r + 1
+		--r=math.random(grTotal)
 		word = gr3.getWord(r)
 		for i=1,#prevWords do
 			if word == prevWords[i] then
@@ -147,7 +154,7 @@ local function handleSwipe( event )
 				else
 					word = getNextWord()
 					timer.performWithDelay(500,function()
-					wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+					wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
 		
 					isPlaying = true
 					wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
@@ -234,7 +241,7 @@ function scene:create( event )
 	    word = getNextWord()
 		isPlaying = true
 		timer.performWithDelay(500,function()
-		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+		wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 		end)
 		prevWords[#prevWords+1] = word
@@ -264,7 +271,7 @@ function scene:show( event )
 		math.randomseed( os.time() )
 		if(isPlaying==false)then
 			timer.performWithDelay(500,function()
-			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+			wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
 			isPlaying = true
 			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 			end)

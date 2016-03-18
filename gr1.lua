@@ -201,6 +201,9 @@ local words = {
 function gr1.getWord(i)
 	return words[i]
 end
+function gr1.total()
+	return #words
+end
 function gr1.maxlength()
 	local maximum = 0
 	local maxWord =""

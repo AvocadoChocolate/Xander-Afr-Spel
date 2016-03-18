@@ -1,8 +1,13 @@
 local composer = require( "composer" )
 require("onScreenKeyboard") -- include the onScreenKeyboard.lua file
-local gr3 = require("gr1")
-local gr1Total = 150
-local gr2Total = 300
+local gr3
+if(grade == "1")then
+gr3 = require("gr1")
+else
+ gr3 = require("gr2")
+end
+local gr1Total = gr3.total()
+local gr2Total = gr3.total()
 local scene = composer.newScene()
 local keyboard
 local myText
@@ -60,7 +65,7 @@ local function getNextWord()
 		word = gr3.getWord(r)
 		isPlaying = true
 		timer.performWithDelay(500,function()
-		wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+		wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
 		wordChannel = audio.play( wordSound ,{onComplete=function() isPlaying = false end })
 		end)
 		
@@ -242,7 +247,7 @@ local function redrawKeyboard()
 							end
 						elseif(event.key == "sound")then
 							if(isPlaying==false)then
-								wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+								wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3"  )
 								isPlaying = true
 								wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 							end
@@ -490,7 +495,7 @@ function scene:show( event )
 		redrawKeyboard()
 		if(isPlaying==false)then
 			timer.performWithDelay(500,function()
-			wordSound = audio.loadSound( "sound/graad1/"..word..".mp3" )
+			wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3"  )
 			isPlaying = true
 			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 			end)
