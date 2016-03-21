@@ -98,12 +98,14 @@ local function getNextWord()
 		check = false
 		r = math.random(grTotal )
 		word = gr3.getWord(r)
+		
 		if(string.len(word)<3) then
 				check =true
 		end
 		for i=1,#prevWords do
 			if word == prevWords[i] then
-				check =true
+				print(i)
+				check =false
 			end
 		end
 	end
@@ -192,7 +194,7 @@ local function splitFirstVowel(w)
 end
 local function splitCheck(splitWord)
 	
-	if(string.len(splitWord)<7)then
+	if(string.len(splitWord)<4)then
 		pieces[#pieces+1]=splitWord
 	else
 		local s1,s2 = splitDoubleConsonants(splitWord)
@@ -212,7 +214,7 @@ local function splitCheck(splitWord)
 end
 local function splitMCheck(splitWord)
 	
-	if(string.len(splitWord)<6)then
+	if(string.len(splitWord)<4)then
 		mpieces[#mpieces+1]=splitWord
 	else
 		local m1,m2 = splitDoubleConsonants(splitWord)
@@ -496,7 +498,7 @@ local function Next()
 			matchGroup:insert(myText)
 			matchGroup.x = display.contentWidth / 2
 			matchGroup.y = display.contentHeight - yInset*4
-			prevX = length+ 20
+			prevX = prevX + length + 15
 			
 			wordsGroup:insert(pieceGroup)
 			
@@ -663,14 +665,14 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-		math.randomseed( os.time() )
+		--math.randomseed( os.time() )
 		if(xanderGroup.alpha==0)then
 			xanderGroup.alpha = 1
 			timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		end
 		if(isPlaying==false)then
 			timer.performWithDelay(500,function()
-			wordSound = audio.loadSound("sound/graad"..grade.."/"..curWord.text..".mp3" )
+			wordSound = audio.loadSound("sound/graad"..grade.."/"..word..".mp3" )
 			isPlaying = true
 			wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 			end)
@@ -689,7 +691,10 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
-		
+		if(isPlaying)then
+						audio.stop()
+						isPlaying = false
+					end
     end 
 end
 

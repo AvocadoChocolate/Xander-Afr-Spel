@@ -165,7 +165,7 @@ function scene:show( event )
 					back:addEventListener("tap",block)
 					sceneGroup:insert(back)
 					local xander = display.newImage("2-reverse.png")
-					xander.x = display.contentWidth  / 2 - xInset * 2
+					xander.x = display.contentWidth  / 2 - xInset * 2.5
 					xander.y = display.contentHeight - yInset*12
 					xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 					sceneGroup:insert(xander)
@@ -174,7 +174,8 @@ function scene:show( event )
 					local options = 
 					{
 						--parent = row,
-						text = "Is jy seker jy wil \ndie speler verwyder?",     
+						text = ([[Is jy seker jy wil
+						die speler verwyder?]]),     
 						--x = 0,
 						--y = 200,
 						--width = 128,     --required for multi-line and alignment

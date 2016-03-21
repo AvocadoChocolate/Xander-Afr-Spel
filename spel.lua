@@ -490,7 +490,7 @@ function scene:show( event )
 		-- 
 		-- INSERT code here to make the scene come alive
 		-- e.g. start timers, begin animation, play audio, etc.
-		math.randomseed( os.time() )
+		--math.randomseed( os.time() )
 		drawLines()
 		redrawKeyboard()
 		if(isPlaying==false)then
@@ -525,6 +525,10 @@ function scene:hide( event )
 		playersList[cur].correct = correct
 		playersList[cur].incorrect = incorrect
 		addAndSavePlayers(playersList)
+		if(isPlaying)then
+						audio.stop()
+						isPlaying = false
+					end
 	end	
 	
 end

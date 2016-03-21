@@ -268,7 +268,7 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
        
 		--sceneGroup:rotate( 90 )
-		math.randomseed( os.time() )
+		--math.randomseed( os.time() )
 		if(isPlaying==false)then
 			timer.performWithDelay(500,function()
 			wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
@@ -294,6 +294,10 @@ function scene:hide( event )
 			xanderGroup.alpha = 1
 			timer.performWithDelay(2500,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
 		end
+		if(isPlaying)then
+						audio.stop()
+						isPlaying = false
+					end
     end 
 end
 

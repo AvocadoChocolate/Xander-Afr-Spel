@@ -24,7 +24,7 @@ local bg = display.newImage("background.png")
 --When Player is made current addandsaveplayers so its at top for next load
 ----------------------------------------------------------------------------------------------------------
 
-
+math.randomseed( os.time() )
 
 function getPlayers()
 	local playersList = {}

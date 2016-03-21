@@ -281,22 +281,6 @@ function onScreenKeyboard:new(params)
         end
     end
 
-    local activateOrientationListener = true
-    if(params.IGNORE_ORIENTATION_CHANGES ~= nil) then
-        if(type(params.IGNORE_ORIENTATION_CHANGES) == "boolean")then
-            activateOrientationListener = not params.IGNORE_ORIENTATION_CHANGES
-        else
-            print("param IGNORE_ORIENTATION_CHANGES is wrong")
-        end
-
-    end
-
-    if(activateOrientationListener == true) then
-        local cl = function(event)
-                    return self:orientationChange(event)
-                   end
-        Runtime:addEventListener("orientation", cl)
-    end
 
     self.displayGroup = display.newGroup()
  end

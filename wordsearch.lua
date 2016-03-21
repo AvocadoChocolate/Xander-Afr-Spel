@@ -299,14 +299,14 @@ function myTouchListener( event )
 						timer.performWithDelay(2500,function() Next() end)
 					end
 					local curWord = searchList[correctmask[correctc][correctr]]
-					if(isPlaying)then
+					--if(isPlaying)then
 						audio.stop()
-						isPlaying = false
-					end
-					
+						--isPlaying = false
+					--end
+					isPlaying = true
 					wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
 					wordChannel = audio.play( wordSound,{onComplete= function() isPlaying = false end})
-					isPlaying = true
+					
 					local length = curWord.contentWidth
 					local height = curWord.contentHeight
 					local rect = display.newRect(curWord.x-5,curWord.y + height/2,length+ 10,3)
@@ -591,7 +591,7 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
-		math.randomseed( os.time() )
+		--math.randomseed( os.time() )
 	   
     end 
 end
@@ -607,7 +607,10 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
-		
+		if(isPlaying)then
+						audio.stop()
+						isPlaying = false
+					end
     end 
 end
 
