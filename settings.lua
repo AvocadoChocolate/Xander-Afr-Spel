@@ -143,13 +143,17 @@ function scene:show( event )
 			-- rowTitle.anchorX = 0
 			-- rowTitle.x = xInset*4
 			-- rowTitle.y = rowHeight * 0.5
-			
+			local rowBox = display.newRoundedRect(row,0,0,xInset*10,rowHeight-rowHeight/20,2)
+				rowBox.anchorY = 0
+				rowBox.anchorX = 0
+				rowBox.y = 0
+				rowBox.x = xInset*5
 			local wordSize = string.len(word)
 			
 			local linesGroup = display.newGroup()
 			for i=1, wordSize do
-				local dash = display.newLine(i*(xInset),rowHeight * 0.5, i*(xInset) + 15,rowHeight * 0.5)
-				dash:setStrokeColor(1, 1, 1)
+				local dash = display.newLine(i*(xInset),rowHeight, i*(xInset) + 15,rowHeight)
+				dash:setStrokeColor(255/255, 51/255, 204/255)
 				dash.strokeWidth = 2
 				linesGroup:insert(dash)
 				local options = 
@@ -166,18 +170,19 @@ function scene:show( event )
 
 				local myText = display.newText( options )
 				myText.anchorX =0
-				myText.anchorY =0
+				--myText.anchorY =0
 				myText.alpha = 1
 				myText.x = i*(xInset)
-				myText.y = -rowHeight * 0.1
+				myText.y = rowHeight * 0.6
 				myText:setFillColor( 0, 0, 0 )
 				myText.pos = i
 				linesGroup:insert(myText)
 			end
 			linesGroup.anchorChildren = true
-			linesGroup.anchorX = 0.5
+			linesGroup.anchorX = 0
 			linesGroup.anchorY = 0
-			linesGroup.x = display.contentWidth / 2
+			linesGroup.y = rowHeight* 0.1
+			linesGroup.x = xInset*6
 			row:insert(linesGroup)
 			
 		end

@@ -53,9 +53,12 @@ local function getNextWord()
 	local check = true
 	while(check)do
 		check = false
-		r = r + 1
-		--r=math.random(grTotal)
+		--r = r + 1
+		r=math.random(grTotal)
 		word = gr3.getWord(r)
+		if(string.len(word)>11)then
+			check = true
+		end
 		for i=1,#prevWords do
 			if word == prevWords[i] then
 				check =true
@@ -74,7 +77,7 @@ local function drawCard()
 	cardGroup.x = display.contentWidth / 2
 	cardGroup.y = display.contentHeight / 2
 	card = display.newImage("back.png")
-	card:scale(xInset*10/card.width,yInset*10/card.height)
+	card:scale(xInset*8/card.width,xInset*8/card.width)
 	card.anchorX = 0
 	card.anchorY = 0
 	--card.strokeWidth = 3
@@ -95,24 +98,58 @@ local function onTap(event)
 			--y = 200,
 			--width = 128,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 72,
+			fontSize = 64,
 			align = "right"  --new alignment parameter
 		}
-
+		
 		local myText = display.newText( options )
 		myText.alpha = 1
-		myText.x = xInset*5
-		myText.y = yInset*5
+		--myText.anchorX = 0.5
+		myText.anchorY = 0.5
+		myText.x = xInset*4
+		myText.y = yInset * 5
 		myText:setFillColor( 0.4 )
 		cardf = display.newImage("front.png")
-		cardf:scale(xInset*10/card.width,yInset*10/card.height)
+		cardf:scale(xInset*8/card.width,xInset*8/card.width)
 		cardf.anchorX = 0
 		cardf.anchorY = 0
+		
+		print("Text size"..(myText.width))
+		print("Card size".. cardf.contentWidth)
+		local fs = 64
+			
+		while(myText.width>(cardf.contentWidth-24))do
+			
+			fs = fs - 1
+			myText:removeSelf()
+			myText = nil
+			local options = 
+			{
+				--parent = textGroup,
+				text = word,     
+				--x = 0,
+				--y = 200,
+				--width = 128,     --required for multi-line and alignment
+				font = "TeachersPet",   
+				fontSize = fs,
+				align = "right"  --new alignment parameter
+			}
+			
+			myText = display.newText( options )
+			myText.alpha = 1
+			--myText.anchorX = 0.5
+			myText.anchorY = 0.5
+			myText.x = xInset*4
+			myText.y = yInset * 4
+			myText:setFillColor( 0.4 )
+			myText.fontSize = fs
+		end
+		print("Text size"..(myText.width))
+		print("Card size".. cardf.contentWidth)
 		cardGroup:remove(card)
 		cardGroup:insert(cardf)
 		cardGroup:insert(myText)
 		card:setFillColor(1 )
-		
 		transition.to( cardGroup, { time=200, yScale = 1, onComplete=function()
 			cardGroup:removeEventListener("tap",onTap)
 		end } )
@@ -237,7 +274,23 @@ function scene:create( event )
 		menuGroup.y =  yInset*2
 		menuGroup:addEventListener( "tap", gotoHome )
 		flashGroup:insert(menuGroup)
+		local soundButton = display.newImage("Sound.png")
+		soundButton:scale(xInset*2/soundButton.width,xInset*2/soundButton.width)
+		soundButton.x = xInset*2
+		soundButton.y = display.contentHeight - yInset*2
+		local function playWord(event)
+			transition.to(soundButton,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(soundButton,{time = 100, alpha = 1})
+			end})
+			if(isPlaying==false)then
+				wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
+				isPlaying = true
+				wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
+			end
+		end
 		
+		soundButton:addEventListener("tap",playWord)
+		flashGroup:insert(soundButton)
 	    word = getNextWord()
 		isPlaying = true
 		timer.performWithDelay(500,function()

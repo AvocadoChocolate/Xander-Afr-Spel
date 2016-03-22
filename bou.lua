@@ -636,7 +636,7 @@ function scene:create( event )
 			transition.to(soundButton,{time = 100, alpha = 1})
 			end})
 			if(isPlaying==false)then
-				wordSound = audio.loadSound( "sound/graad"..grade.."/"..curWord.text..".mp3" )
+				wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
 				isPlaying = true
 				wordChannel = audio.play( wordSound ,{onComplete=function()isPlaying=false end})
 			end
@@ -691,10 +691,10 @@ function scene:hide( event )
         -- e.g. stop timers, stop animation, unload sounds, etc.)
     elseif phase == "did" then
         -- Called when the scene is now off screen
-		if(isPlaying)then
-						audio.stop()
-						isPlaying = false
-					end
+		
+			audio.stop()
+			isPlaying = false
+		
     end 
 end
 
