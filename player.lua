@@ -97,6 +97,17 @@ function scene:show( event )
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
 			if(#plaersList>=1)then
+				local gr3
+				local grTotal
+				if(plaersList[row.index].grade == "1")then
+					gr3 = require("gr1")
+					grTotal = gr3.total()+53
+				else
+					gr3 = require("gr2")
+					grTotal = gr3.total()+50
+				end
+				 --+ math.round(gr3.total()/2)
+				
 				local rowBox = display.newRoundedRect(row,0,0,xInset*18,rowHeight-rowHeight/10,2)
 				rowBox.anchorY = 0
 				rowBox.anchorX = 0
@@ -109,6 +120,11 @@ function scene:show( event )
 					incorrect = plaersList[row.index].incorrect
 					cur = row.index
 					print(player)
+					composer.removeScene("spel")
+					composer.removeScene("wordsearch")
+					composer.removeScene("bou")
+					composer.removeScene("flash")
+					
 					composer.gotoScene("menu",{time = 500,effect = "fade"})
 					return true
 				end
@@ -123,22 +139,46 @@ function scene:show( event )
 				rowTitle.y = rowHeight * 0.5
 				local rowTitle = display.newText( row,"Graad: "..plaersList[row.index].grade , 0, 0,"TeachersPet", 24 )
 				rowTitle:setFillColor( 0,0,0,0.5  )
-
+				
 				--Align the label left and vertically centered
 				rowTitle.anchorX = 0
 				rowTitle.anchorY = 0
 				rowTitle.x = display.contentWidth/2 - xInset*2
 				rowTitle.y = rowHeight * 0.5
-				local rowTitle = display.newText( row,plaersList[row.index].correct.."/150" , 0, 0,"TeachersPet", 24 )
-				rowTitle:setFillColor( 0,0,0,0.5)
+				if(tonumber(plaersList[row.index].correct) == grTotal and plaersList[row.index].grade =="1")then
+					local graduate = display.newImage(row,"grad2.png")
+					graduate:scale(rowHeight*0.7/graduate.width,rowHeight*0.7/graduate.width)
+					graduate.anchorX = 0
+					--graduate.anchorY = 0
+					graduate.x = xInset*12
+					graduate.y = rowHeight *0.65
+					local function grad(event)
+						plaersList[row.index].grade = "2"
+						plaersList[row.index].correct = 0
+						plaersList[row.index].incorrect = 0
+						addAndSavePlayers(plaersList)
+						if(cur ==  row.index)then
+						player = plaersList[row.index].name
+						grade = plaersList[row.index].grade
+						correct = plaersList[row.index].correct
+						incorrect = plaersList[row.index].incorrect
+						end
+						composer.removeScene("player")
+						composer.gotoScene("player")
+					return true
+					end
+					graduate:addEventListener("tap",grad)
+				else
+					local rowTitle = display.newText( row,plaersList[row.index].correct.." / ".. grTotal, 0, 0,"TeachersPet", 24 )
+					rowTitle:setFillColor( 0,0,0,0.5)
 
-				--Align the label left and vertically centered
-				rowTitle.anchorX = 0
-				rowTitle.anchorY = 0
-				rowTitle.x = xInset*12
-				rowTitle.y = rowHeight *0.5
-				--Draw small pink line
-				
+					--Align the label left and vertically centered
+					rowTitle.anchorX = 0
+					rowTitle.anchorY = 0
+					rowTitle.x = xInset*12
+					rowTitle.y = rowHeight *0.5
+					--Draw small pink line
+				end
 				
 				local deleteRect = display.newRoundedRect(row,0,0,xInset* 2,rowHeight-rowHeight/10,0.5)
 				deleteRect.anchorY = 0
@@ -281,6 +321,16 @@ function scene:show( event )
 						end
 						table.remove(plaersList,row.index)
 						addAndSavePlayers(plaersList)
+						if(cur ==  row.index)then
+							plaersList = getPlayers()
+							if(plaersList[1]~=nil)then
+							player = plaersList[1].name
+							grade = plaersList[1].grade
+							correct = plaersList[1].correct
+							incorrect = plaersList[1].incorrect
+							cur = 1
+							end
+						end
 						composer.removeScene("player")
 						composer.gotoScene("player")
 						return true

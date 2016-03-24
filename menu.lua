@@ -420,10 +420,19 @@ function scene:create( event )
 			gradeText.alpha = 1
 			gradeText:setFillColor( 0, 0, 0,0.4 )
 			menuGroup:insert(gradeText)
+			local gr3
+			local grTotal
+			if(grade == "1")then
+				gr3 = require("gr1")
+				grTotal = gr3.total()+53
+			else
+				gr3 = require("gr2")
+				grTotal = gr3.total()+50
+			end
 			local Scoreoptions = 
 			{
 				--parent = textGroup,
-				text = "Punt:     "..correct.." / 150",     
+				text = "Punt:     "..correct.." / "..grTotal,     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
@@ -457,11 +466,20 @@ function scene:show( event )
         -- e.g. start timers, begin animation, play audio, etc
         
         -- we obtain the object by id from the scene's object hierarchy
+		local gr3
+			local grTotal
+			if(grade == "1")then
+				gr3 = require("gr1")
+				grTotal = gr3.total()+53
+			else
+				gr3 = require("gr2")
+				grTotal = gr3.total()+50
+			end
         local players = getPlayers()
 		if(player~="")then
 			nameText.text =  "Naam:  "..player
 			gradeText.text = "Graad:  "..grade
-			scoreText.text = "Punt:     "..correct .. " / 150"
+			scoreText.text = "Punt:     "..correct .. " / "..grTotal
 		end
     end 
 end

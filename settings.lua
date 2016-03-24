@@ -7,7 +7,7 @@
 local sceneName = ...
 
 local composer = require( "composer" )
-local gr3 = require("g3")
+
 local widget = require( "widget" )
 -- Load scene with same root filename as this file
 local scene = composer.newScene( sceneName )
