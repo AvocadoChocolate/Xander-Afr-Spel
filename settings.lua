@@ -50,6 +50,36 @@ function scene:show( event )
 			return true
 		end
 		local menuGroup = display.newGroup()
+		local xander = display.newImage("2-reverse.png")
+		xander.x = display.contentWidth - xInset*1.5
+		xander.y = display.contentHeight - yInset*2
+		xander:scale(xInset*2/xander.contentWidth,xInset*2/xander.contentWidth)
+		sceneGroup:insert(xander)
+		
+		local options = 
+		{
+			--parent = textGroup,
+			text = "Hersien al die verkeerde woorde",     
+			--x = 0,
+			--y = 200,
+			width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 18,
+			align = "left"  --new alignment parameter
+		}
+
+	    local myText = display.newText( options )
+		myText.anchorY =0.5
+		myText.alpha = 1
+		myText.x = display.contentWidth - xInset*2.1
+		myText.y = display.contentHeight - yInset*6.5 - 4.5
+		myText:setFillColor( 1, 1, 1 )
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth - xInset*2.5
+		speechBox.y = display.contentHeight - yInset*6.5
+		speechBox:scale(-(myText.width + 18)/speechBox.contentWidth,(myText.height+18)/speechBox.contentHeight)
+		sceneGroup:insert(speechBox)
+		sceneGroup:insert(myText)
 		local mCircle = display.newImage("homeI.png")
 		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )

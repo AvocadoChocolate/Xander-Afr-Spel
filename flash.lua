@@ -89,6 +89,7 @@ local function drawCard()
 end
 local function onTap(event)
 	if(isPlaying==false)then
+	cardGroup:removeEventListener("tap",onTap)
 	transition.to( cardGroup, { time=200, yScale = 0.01, onComplete=function()
 		local options = 
 		{
@@ -151,7 +152,7 @@ local function onTap(event)
 		cardGroup:insert(myText)
 		card:setFillColor(1 )
 		transition.to( cardGroup, { time=200, yScale = 1, onComplete=function()
-			cardGroup:removeEventListener("tap",onTap)
+			--cardGroup:addEventListener("tap",onTap)
 		end } )
 	end } )
     --cardGroup
