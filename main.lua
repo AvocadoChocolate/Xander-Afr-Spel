@@ -15,10 +15,10 @@ local composer = require "composer"
 
 -- Add any objects that should appear on all scenes below (e.g. tab bar, hud, etc)
 local bg = display.newImage("background.png")
-	    bg.anchorX =0
-	    bg.anchorY =0
-	
-		bg:toBack()
+bg.anchorX =0
+bg.anchorY =0
+bg:scale(display.contentWidth/bg.contentWidth,display.contentHeight/bg.contentHeight)
+bg:toBack()
 ----------------------------------------------------------------------------------------------------------
 --Load gloabal varibales for current player first element in players.txt will be current player.
 --When Player is made current addandsaveplayers so its at top for next load

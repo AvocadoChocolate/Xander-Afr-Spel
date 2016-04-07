@@ -47,7 +47,11 @@ local wordSound
 local wordChannel
 local isPlaying=false
 local function gotoHome(event)
-	if isPlaying == false then
+	if(isPlaying)then
+		audio.stop()
+		
+		isPlaying = false
+	end
 	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
 			transition.to(menuGroup,{time = 100, alpha = 1})
 			end})
@@ -56,7 +60,7 @@ local function gotoHome(event)
 	transition.to(wordsSearchGroup,{time=500,x = 0})
 	end})
 	composer.gotoScene("menu",{time = 500,effect="fromRight"}) 
-	end
+	
 	return true
 end
 local function Next()

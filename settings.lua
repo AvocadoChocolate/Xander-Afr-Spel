@@ -40,11 +40,16 @@ function scene:show( event )
         
         -- we obtain the object by id from the scene's object hierarchy
 		list = getIncorrectWords()
-       local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
+		-- local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
+	    -- bg.anchorX =0
+	    -- bg.anchorY =0
+	    -- bg:setFillColor(255/255, 51/255, 204/255)
+	    -- sceneGroup:insert(bg)
+		local bg = display.newImage("background.png")
 	    bg.anchorX =0
 	    bg.anchorY =0
-	    bg:setFillColor(255/255, 51/255, 204/255)
-	    sceneGroup:insert(bg)
+		bg:scale(display.contentWidth/bg.contentWidth,display.contentHeight/bg.contentHeight)
+		sceneGroup:insert(bg)
 		local function gotoHome(event)
 			composer.gotoScene("menu")
 			return true
@@ -104,7 +109,7 @@ function scene:show( event )
 		myText.anchorX =0.5
 		myText.anchorY =0
 		myText.alpha = 1
-		myText.x = display.contentWidth  / 2
+		myText.x = display.contentWidth  / 2 - xInset
 		myText.y = yInset
 		myText:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(myText)
@@ -131,7 +136,7 @@ function scene:show( event )
 		myText.anchorX =0.5
 		myText.anchorY =0
 		myText.alpha = 1
-		myText.x = display.contentWidth  / 2
+		myText.x = display.contentWidth  / 2 - xInset
 		myText.y = yInset*3
 		myText:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(myText)
@@ -152,7 +157,7 @@ function scene:show( event )
 		myText.anchorX =0.5
 		myText.anchorY =0
 		myText.alpha = 1
-		myText.x = display.contentWidth  / 2
+		myText.x = display.contentWidth  / 2 - xInset
 		myText.y = yInset*5
 		myText:setFillColor( 0, 0, 0 )
 		sceneGroup:insert(myText)
@@ -173,11 +178,11 @@ function scene:show( event )
 			-- rowTitle.anchorX = 0
 			-- rowTitle.x = xInset*4
 			-- rowTitle.y = rowHeight * 0.5
-			local rowBox = display.newRoundedRect(row,0,0,xInset*10,rowHeight-rowHeight/20,2)
-				rowBox.anchorY = 0
-				rowBox.anchorX = 0
-				rowBox.y = 0
-				rowBox.x = xInset*5
+			-- local rowBox = display.newRoundedRect(row,0,0,xInset*10,rowHeight-rowHeight/20,2)
+				-- rowBox.anchorY = 0
+				-- rowBox.anchorX = 0
+				-- rowBox.y = 0
+				-- rowBox.x = xInset*5
 			local wordSize = string.len(word)
 			
 			local linesGroup = display.newGroup()
@@ -209,10 +214,10 @@ function scene:show( event )
 				linesGroup:insert(myText)
 			end
 			linesGroup.anchorChildren = true
-			linesGroup.anchorX = 0
+			linesGroup.anchorX = 0.5
 			linesGroup.anchorY = 0
 			linesGroup.y = rowHeight* 0.1
-			linesGroup.x = xInset*6
+			linesGroup.x = xInset*9
 			row:insert(linesGroup)
 			
 		end

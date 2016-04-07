@@ -32,8 +32,7 @@ function scene:create( event )
 	local bg = display.newImage("background.png")
 	    bg.anchorX =0
 	    bg.anchorY =0
-		bg.x = -xInset*2
-	    bg:setFillColor(1)
+		bg:scale(display.contentWidth/bg.contentWidth,display.contentHeight/bg.contentHeight)
 	    sceneGroup:insert(bg)
 		local menuGroup = display.newGroup()
 		
@@ -103,25 +102,25 @@ function scene:create( event )
 		settingsGroup.y =  yInset*2
 		setCircle:scale(xInset*2/setCircle.width,xInset*2/setCircle.width)
 		local function gotoPlayer(event)
-			local p = display.newCircle(playersGroup.x,playersGroup.y,20)
-			sceneGroup:insert(p )
-			p:setFillColor(255/255, 51/255, 204/255)
+			-- local p = display.newCircle(playersGroup.x,playersGroup.y,20)
+			-- sceneGroup:insert(p )
+			-- p:setFillColor(255/255, 51/255, 204/255)
 			playersGroup:removeEventListener("tap", gotoPlayer)
-			transition.to(p,{time = 500,yScale = 50,xScale = 50,onComplete=function()
+			--transition.to(p,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
-			composer.gotoScene("player") end})
+			composer.gotoScene("player") --end})
 			
 			return true
 		end
 		local function gotoSettings(event)
-			local s = display.newCircle(settingsGroup.x,settingsGroup.y,20)
-			s:setFillColor(255/255, 51/255, 204/255)
-			sceneGroup:insert(s)
+			-- local s = display.newCircle(settingsGroup.x,settingsGroup.y,20)
+			-- s:setFillColor(255/255, 51/255, 204/255)
+			-- sceneGroup:insert(s)
 			settingsGroup:removeEventListener( "tap", gotoSettings )
 			--setCircle:setFillColor( 255/255, 51/255, 204/255 )
-			transition.to(s,{time = 500,yScale = 50,xScale = 50,onComplete=function()
+			--transition.to(s,{time = 500,yScale = 50,xScale = 50,onComplete=function()
 			timer.performWithDelay(100,function()composer.removeScene("menu") end)
-			composer.gotoScene("settings") end})
+			composer.gotoScene("settings") --end})
 			return true
 		end
 	    local spelGroup = display.newGroup()

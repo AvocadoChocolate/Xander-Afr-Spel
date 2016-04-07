@@ -75,7 +75,12 @@ local function gotoHome(event)
 	--composer.gotoScene("menu")
 	
 	print(isPlaying)
-	if(isPlaying == false and wordComplete==false)then
+	if(isPlaying)then
+		audio.stop()
+		
+		isPlaying = false
+	end
+	if( wordComplete==false)then
 	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
 			transition.to(menuGroup,{time = 100, alpha = 1})
 			end})
@@ -425,6 +430,7 @@ local function Next()
 			myText.anchorY =0
 			myText.alpha = 1
 			myText:setFillColor( 0, 0, 0 )
+			
 			local canvasCollided = false
 			while  canvasCollided==false do
 				canvasCollided = true
@@ -432,15 +438,17 @@ local function Next()
 				local yPos =  math.random(display.contentHeight - yInset*10)+ yInset
 				myText.x =xPos
 				myText.y = yPos
-				
+				local length = myText.contentWidth + 20
+				local height = myText.contentHeight + 20
+				local rect = display.newRect(myText.x-5,myText.y +height/2,length+ 10,height+10)
 				for l=1,#canvas do
 					
-					if(hasCollided(myText,canvas[l]))then
+					if(hasCollided(rect,canvas[l]))then
 						
 						canvasCollided = false
 					end
 				end
-				
+				rect:removeSelf()
 			end
 		
 			

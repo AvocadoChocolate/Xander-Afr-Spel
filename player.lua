@@ -49,11 +49,16 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
 	    plaersList = getPlayers()
 	
-        local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
+        -- local bg = display.newRect(0,0,display.contentWidth,display.contentHeight)
+	    -- bg.anchorX =0
+	    -- bg.anchorY =0
+	    -- bg:setFillColor(255/255, 51/255, 204/255)
+	    -- sceneGroup:insert(bg)
+		local bg = display.newImage("background.png")
 	    bg.anchorX =0
 	    bg.anchorY =0
-	    bg:setFillColor(255/255, 51/255, 204/255)
-	    sceneGroup:insert(bg)
+		bg:scale(display.contentWidth/bg.contentWidth,display.contentHeight/bg.contentHeight)
+		sceneGroup:insert(bg)
 		local options = 
 		{
 			--parent = row,
