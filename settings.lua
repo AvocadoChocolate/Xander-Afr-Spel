@@ -170,8 +170,8 @@ function scene:show( event )
 			-- Cache the row "contentWidth" and "contentHeight" because the row bounds can change as children objects are added
 			local rowHeight = row.contentHeight
 			local rowWidth = row.contentWidth
-			local word = list[row.index]
-			-- local rowTitle = display.newText( row,word , 0, 0,"TeachersPet", 14 )
+			local w = list[row.index]
+			-- local rowTitle = display.newText( row,w , 0, 0,"TeachersPet", 14 )
 			-- rowTitle:setFillColor( 0 )
 
 			-- Align the label left and vertically centered
@@ -183,7 +183,7 @@ function scene:show( event )
 				-- rowBox.anchorX = 0
 				-- rowBox.y = 0
 				-- rowBox.x = xInset*5
-			local wordSize = string.len(word)
+			local wordSize = string.len(w)
 			
 			local linesGroup = display.newGroup()
 			for i=1, wordSize do
@@ -194,7 +194,7 @@ function scene:show( event )
 				local options = 
 				{
 					--parent = row,
-					text = word:sub(i,i),     
+					text = w:sub(i,i),     
 					--x = 0,
 					--y = 200,
 					--width = 128,     --required for multi-line and alignment
@@ -218,6 +218,12 @@ function scene:show( event )
 			linesGroup.anchorY = 0
 			linesGroup.y = rowHeight* 0.1
 			linesGroup.x = xInset*9
+			local function spel(event)
+				word = w
+				composer.gotoScene("Spel")
+				return true
+			end
+			row:addEventListener("tap",spel)
 			row:insert(linesGroup)
 			
 		end

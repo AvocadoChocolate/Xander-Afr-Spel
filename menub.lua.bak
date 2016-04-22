@@ -132,18 +132,10 @@ function scene:create( event )
 		
 		settingsGroup:addEventListener( "tap", gotoSettings )
 		end)
-		--local sCircle = display.newImage("SpelDesign.png")
-		local sCircle = display.newCircle(0,0,xInset*4)
-		sCircle:setFillColor(140/255, 198/255, 63/255)
-		--local bCircle = display.newImage("tetris.png")
-		local bCircle = display.newCircle(0,0,xInset*4)
-		bCircle:setFillColor(127/255, 205/255, 238/255)
-		--local wCircle = display.newImage("wordsearchIcon.png")
-		local wCircle = display.newCircle(0,0,xInset*4)
-		wCircle:setFillColor(251/255, 176/255, 59/255)
-		--local fCircle = display.newImage("FlashIcon.png")
-		local fCircle = display.newCircle(0,0,xInset*4)
-		fCircle:setFillColor(255/255, 51/255, 204/255)
+		local sCircle = display.newImage("SpelDesign.png")
+		local bCircle = display.newImage("tetris.png")
+		local wCircle = display.newImage("wordsearchIcon.png")
+		local fCircle = display.newImage("FlashIcon.png")
 		bCircle:scale(xInset*4/bCircle.width,xInset*4/bCircle.height)
 		sCircle:scale(xInset*4/sCircle.width,xInset*4/sCircle.height)
 		fCircle:scale(xInset*4/fCircle.width,xInset*4/fCircle.height)
@@ -151,12 +143,12 @@ function scene:create( event )
 		local soptions = 
 		{
 			--parent = textGroup,
-			text = "Spel",     
+			text = "",     
 			--x = 0,
 			--y = 200,
-			--width = xInset*3,     --required for multi-line and alignment
+			--width = 62,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 28,
+			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
 		
@@ -164,16 +156,16 @@ function scene:create( event )
 		sText.anchorX =0.5
 		sText.anchorY =0.5
 		sText.alpha = 1
-		sText:setFillColor( 1, 1, 1 )
+		sText:setFillColor( 0, 0, 0 )
 		local boptions = 
 		{
 			--parent = textGroup,
-			text = "Bou",     
+			text = "",     
 			--x = 0,
 			--y = 200,
-			--width = xInset*3,     --required for multi-line and alignment
+			--width = 62,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 28,
+			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
 
@@ -181,16 +173,16 @@ function scene:create( event )
 		bText.anchorX =0.5
 		bText.anchorY =0.5
 		bText.alpha = 1
-		bText:setFillColor( 1, 1, 1 )
+		bText:setFillColor( 0, 0, 0 )
 		local woptions = 
 		{
 			--parent = textGroup,
-			text = "Woordesoek",     
+			text = "",     
 			--x = 0,
 			--y = 200,
-			--width = xInset*3,     --required for multi-line and alignment
+			--width = 62,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 28,
+			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
 
@@ -198,16 +190,16 @@ function scene:create( event )
 		wText.anchorX =0.5
 		wText.anchorY =0.5
 		wText.alpha = 1
-		wText:setFillColor( 1, 1, 1 )
+		wText:setFillColor( 0, 0, 0 )
 		local foptions = 
 		{
 			--parent = textGroup,
-			text = "Flits kaarte",     
+			text = "",     
 			--x = 0,
 			--y = 200,
-			--width = xInset*3,     --required for multi-line and alignment
+			--width = 62,     --required for multi-line and alignment
 			font = "TeachersPet",   
-			fontSize = 28,
+			fontSize = 20,
 			align = "right"  --new alignment parameter
 		}
 
@@ -215,15 +207,15 @@ function scene:create( event )
 		fText.anchorX =0.5
 		fText.anchorY =0.5
 		fText.alpha = 1
-		fText:setFillColor( 1, 1, 1 )
+		fText:setFillColor( 0, 0, 0 )
 		spelGroup:insert(sCircle)
-		spelGroup:insert(sText)
+		--spelGroup:insert(sText)
 		bouGroup:insert(bCircle)
-		bouGroup:insert(bText)
+		--bouGroup:insert(bText)
 		wordsearchGroup:insert(wCircle)
-		wordsearchGroup:insert(wText)
+		--wordsearchGroup:insert(wText)
 		flashGroup:insert(fCircle)
-		flashGroup:insert(fText)
+		--flashGroup:insert(fText)
 		flashGroup.anchorChildren = true
 		flashGroup.anchorX = 0.5
 		flashGroup.anchorY = 0.5
@@ -317,7 +309,7 @@ function scene:create( event )
 						if(myText.text~="Enter Player Name")then
 							local val = {}
 							val.name =myText.text
-							val.grade ="3"
+							val.grade ="1"
 							val.correct ="0"
 							val.incorrect = "0"
 							plaersList = {}
@@ -429,8 +421,8 @@ function scene:create( event )
 			menuGroup:insert(gradeText)
 			local gr3
 			local grTotal
-			if(grade == "3")then
-				gr3 = require("g3")
+			if(grade == "1")then
+				gr3 = require("gr1")
 				grTotal = gr3.total()+53
 			else
 				gr3 = require("gr2")
@@ -439,7 +431,7 @@ function scene:create( event )
 			local Scoreoptions = 
 			{
 				--parent = textGroup,
-				text = "Punt:     "..correct.." / ".."100",     
+				text = "Punt:     "..correct.." / "..grTotal,     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
@@ -475,8 +467,8 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
 		local gr3
 			local grTotal
-			if(grade == "3")then
-				gr3 = require("g3")
+			if(grade == "1")then
+				gr3 = require("gr1")
 				grTotal = gr3.total()+53
 			else
 				gr3 = require("gr2")
@@ -486,7 +478,7 @@ function scene:show( event )
 		if(player~="")then
 			nameText.text =  "Naam:  "..player
 			gradeText.text = "Graad:  "..grade
-			scoreText.text = "Punt:     "..correct .. " / ".."100"
+			scoreText.text = "Punt:     "..correct .. " / "..grTotal
 		end
     end 
 end

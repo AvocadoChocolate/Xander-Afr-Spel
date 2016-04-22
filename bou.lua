@@ -28,7 +28,8 @@ local colors ={{51/255, 204/255, 51/255},
 {255/255, 255/255, 51/255},
 {204/255, 102/255, 255/255}
 }
-
+local tick
+local curPos = 1
 local prevWords = {}
 local canvas ={}
 local pieces = {}
@@ -122,7 +123,7 @@ local function drawLines()
 		local wordSize = string.len(word[k])
 		
 		for j=1,wordSize do
-			local dash = display.newLine(i*(xInset),yInset*5, i*(xInset) + 15,yInset*5)
+			local dash = display.newLine(i*(xInset),0, i*(xInset) + 15,0)
 			dash:setStrokeColor(255/255, 51/255, 204/255)
 			dash.strokeWidth = 2
 			linesGroup:insert(dash)
@@ -144,18 +145,24 @@ local function drawLines()
 			myText.anchorY =0
 			myText.alpha = 0
 			myText.x = i*(xInset)
-			myText.y = yInset * 3.5
+			myText.y = -yInset*2
 			myText:setFillColor( 0, 0, 0 )
 			myText.piece = word[k]
-			myText.pos = i
+			myText.pos = k-1
 			tospell[i] = myText
 			linesGroup:insert(tospell[i])
 			i=i+1
 		end
 		
 	end
+	tick = display.newImage("icon8.png")
+	tick.y = -yInset
+	tick:scale((xInset/1.1)/tick.contentWidth,(xInset/1.1)/tick.contentWidth)
+	tick.x = (string.len(word[1])+1)*xInset + 15
+	tick.alpha = 0
+	linesGroup:insert(tick)
 	for i=1,#tospell do
-	print(tospell[i].text)
+	print(tospell[i].text..tospell[i].pos)
 	end
 	
 end
@@ -249,6 +256,64 @@ local function Next()
 			
 			return true
 		end
+		
+		
+		local function myTap(event)
+			sX = event.target.x
+			print(event.target.t)
+			
+			--print(tospell[counter].text)
+			local lookingFor = ""
+			for i=1,#tospell do
+				if(tospell[i].pos==curPos)then
+					lookingFor = lookingFor..tospell[i].text
+				end
+			end
+			print(lookingFor)
+			print(curPos)
+			if(lookingFor == event.target.t)then
+				event.target.alpha = 0
+				for i=1,#tospell do
+					if(curPos==tospell[i].pos)then
+						tospell[i].alpha = 1
+					end
+				end
+				if(curPos == #word - 1)then
+				
+					tick.alpha = 1
+					wordComplete = true
+					timer.performWithDelay(2500,function()
+					linesGroup:removeSelf()
+					linesGroup=nil
+					linesGroup = display.newGroup()
+					wordsGroup:removeSelf()
+					wordsGroup = nil
+					wordsGroup = display.newGroup()
+					bouGroup:insert(wordsGroup)
+					bouGroup:insert(linesGroup)
+					pieces = {}
+					mpieces ={}
+					tospell = {}
+					canvas ={}
+					--isPlaying = true
+					Next()
+					--isPlaying = true
+					end)
+					
+					
+					curPos = 1
+				else
+					curPos = curPos + 1
+				end
+			else
+				
+				transition.to(event.target,{time =120 ,rotation= 1,x =  sX + 0.1,iterations = 3,onRepeat =function() 
+					transition.to(event.target,{time =120 ,rotation = -1,x= sX - 0.10})
+				end,onComplete =function() transition.to(event.target,{time =6,rotation = 0 ,x=sX}) end})
+			end
+			
+			return true
+		end
 		local matchGroup = display.newGroup()
 		wordsGroup:insert(matchGroup)
 		local prevX = 0
@@ -276,13 +341,13 @@ local function Next()
 			local canvasCollided = false
 			while  canvasCollided==false do
 				canvasCollided = true
-				local xPos = math.random(display.contentWidth - xInset*10)+ xInset*5
-				local yPos =  math.random(display.contentHeight - yInset*10)+ yInset
-				myText.x =xPos
-				myText.y = yPos
+				local xPos = math.random(4)
+				local yPos =  math.random(4)
+				myText.x =xInset*xPos*3+xInset*3
+				myText.y = yInset*yPos*3-yInset
 				local length = myText.contentWidth + 20
 				local height = myText.contentHeight + 20
-				local rect = display.newRect(myText.x-5,myText.y +height/2,length+ 10,height+10)
+				local rect = display.newRoundedRect(myText.x-5,myText.y +height/2,length+ 10,height+10,3)
 				for l=1,#canvas do
 					
 					if(hasCollided(rect,canvas[l]))then
@@ -301,20 +366,20 @@ local function Next()
 			end
 			local length = myText.contentWidth
 			local height = myText.contentHeight
-			local rect = display.newRect(myText.x-5,myText.y +height/2,length+ 10,height+10)
+			local rect = display.newRoundedRect(myText.x-5,myText.y +height/2,length+ 10,height+10,3)
 			rect.anchorX =0
 			rect.anchorY = 0.5
 			rect:setFillColor(color[1],color[2],color[3])
 			pieceGroup:insert(rect)
 			pieceGroup:insert(myText)
 			
-			pieceGroup.piece = word[i]
+			pieceGroup.t = word[i]
 			pieceGroup.pos = i - 1
 		
 			canvas[#canvas+1] = rect
 			--i*(xInset),yInset*5, i*(xInset) + 15,yInset*5
-			--local rect = display.newRect(prevX -5,0,length+ 10,height+10)
-			local rect = display.newRect(prevX,0,length+ 10,height+10)
+			--local rect = display.newRoundedRect(prevX -5,0,length+ 10,height+10)
+			local rect = display.newRoundedRect(prevX,0,length+ 10,height+10,3)
 			rect.anchorX =0
 			rect.anchorY = 0.5
 			rect.alpha = 0
@@ -362,7 +427,7 @@ local function Next()
 			
 			wordsGroup:insert(pieceGroup)
 			
-			pieceGroup:addEventListener( "touch", drag )
+			pieceGroup:addEventListener( "tap", myTap )
 		end
 		
 end

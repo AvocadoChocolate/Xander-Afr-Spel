@@ -85,7 +85,9 @@ local function getNextWord()
 	word = string.lower( word )
 	return word
 end
-local word = getNextWord()
+if(word==nil)then
+ word = getNextWord()
+end
 --Developer mode
 local function developerMode()
 		local options = 
@@ -485,7 +487,7 @@ local function redrawKeyboard()
 												end})
 												composer.removeScene("spel")
 												composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
-												
+												list={}
 												addAndSaveIncorrectWords(list)
 												
 												playersList[cur].grade = grade
