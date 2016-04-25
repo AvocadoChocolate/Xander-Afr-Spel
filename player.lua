@@ -123,13 +123,13 @@ function scene:show( event )
 					grade =plaersList[row.index].grade
 					correct = plaersList[row.index].correct
 					incorrect = plaersList[row.index].incorrect
-					cur = row.index
+					
 					print(player)
 					composer.removeScene("spel")
 					composer.removeScene("wordsearch")
 					composer.removeScene("bou")
 					composer.removeScene("flash")
-					
+					cur = row.index
 					composer.gotoScene("menu",{time = 500,effect = "fade"})
 					return true
 				end

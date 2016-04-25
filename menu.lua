@@ -317,9 +317,10 @@ function scene:create( event )
 						if(myText.text~="Enter Player Name")then
 							local val = {}
 							val.name =myText.text
-							val.grade ="3"
+							val.grade ="1"
 							val.correct ="0"
 							val.incorrect = "0"
+							cur = 1
 							plaersList = {}
 							plaersList[#plaersList+1]=val
 							player = val.name
@@ -429,8 +430,8 @@ function scene:create( event )
 			menuGroup:insert(gradeText)
 			local gr3
 			local grTotal
-			if(grade == "3")then
-				gr3 = require("g3")
+			if(grade == "1")then
+				gr3 = require("gr1")
 				grTotal = gr3.total()+53
 			else
 				gr3 = require("gr2")
@@ -475,8 +476,8 @@ function scene:show( event )
         -- we obtain the object by id from the scene's object hierarchy
 		local gr3
 			local grTotal
-			if(grade == "3")then
-				gr3 = require("g3")
+			if(grade == "1")then
+				gr3 = require("gr1")
 				grTotal = gr3.total()+53
 			else
 				gr3 = require("gr2")
