@@ -220,7 +220,7 @@ function scene:show( event )
 			linesGroup.x = xInset*9
 			local function spel(event)
 				word = w
-				composer.gotoScene("Spel")
+				composer.gotoScene("spel")
 				return true
 			end
 			row:addEventListener("tap",spel)
