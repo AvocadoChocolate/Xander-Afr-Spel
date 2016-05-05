@@ -839,7 +839,7 @@ function scene:create( event )
 		menuGroup = display.newGroup()
 		
 		local mCircle = display.newImage("home.png")
-		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
+		mCircle:scale(xInset*1.5/mCircle.width,xInset*1.5/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
 		menuGroup.x =  xInset*2

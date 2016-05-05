@@ -329,7 +329,7 @@ local function Next()
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 36,
+				fontSize = 48,
 				align = "right"  --new alignment parameter
 			}
 
@@ -343,8 +343,8 @@ local function Next()
 				canvasCollided = true
 				local xPos = math.random(4)
 				local yPos =  math.random(4)
-				myText.x =xInset*xPos*3+xInset*3
-				myText.y = yInset*yPos*3-yInset
+				myText.x =xInset*xPos*3 + xInset
+				myText.y = yInset*yPos*3-yInset*1.5
 				local length = myText.contentWidth + 20
 				local height = myText.contentHeight + 20
 				local rect = display.newRoundedRect(myText.x-5,myText.y +height/2,length+ 10,height+10,3)
@@ -446,7 +446,7 @@ function scene:create( event )
 		
 		local xander = display.newImage("1.png")
 		xander.x = display.contentWidth - xInset*2
-		xander.y = display.contentHeight - yInset*2
+		xander.y = display.contentHeight/2 - yInset*2
 		xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
 		xanderGroup:insert(xander)
 		
@@ -465,12 +465,12 @@ function scene:create( event )
 	    local myText = display.newText( options )
 		myText.anchorY =0.5
 		myText.alpha = 1
-		myText.x = display.contentWidth - xInset*4.5
-		myText.y = display.contentHeight - yInset*5.5 - 4.5
+		myText.x = display.contentWidth - xInset*2.5
+		myText.y = display.contentHeight/2 -yInset*7- 4.5
 		myText:setFillColor( 1, 1, 1 )
 		local speechBox = display.newImage("speechbox.png")
-		speechBox.x = display.contentWidth - xInset*4.5
-		speechBox.y = display.contentHeight - yInset*5.5
+		speechBox.x = display.contentWidth - xInset*2.5
+		speechBox.y = display.contentHeight/2 -yInset*7
 		speechBox:scale(-(myText.contentWidth+10)/speechBox.contentWidth,yInset*2/speechBox.contentHeight)
 		xanderGroup:insert(speechBox)
 		xanderGroup:insert(myText)
@@ -478,16 +478,16 @@ function scene:create( event )
 		bouGroup:insert(xanderGroup)
 		menuGroup = display.newGroup()
 		local mCircle = display.newImage("home.png")
-		mCircle:scale(xInset*2/mCircle.width,xInset*2/mCircle.width)
+		mCircle:scale(xInset*1.5/mCircle.width,xInset*1.5/mCircle.width)
 		--mCircle:setFillColor( 255/255, 51/255, 204/255 )
 		menuGroup:insert(mCircle)
-		menuGroup.x =  xInset*2
+		menuGroup.x =  xInset*1.5
 		menuGroup.y =  yInset*2
 		menuGroup:addEventListener( "tap", gotoHome )
 		bouGroup:insert(menuGroup)
 		local soundButton = display.newImage("Sound.png")
-		soundButton:scale(xInset*2/soundButton.width,xInset*2/soundButton.width)
-		soundButton.x = xInset*2
+		soundButton:scale(xInset*1.5/soundButton.width,xInset*1.5/soundButton.width)
+		soundButton.x = xInset*1.5
 		soundButton.y = display.contentHeight - yInset*2
 		local function playWord(event)
 			transition.to(soundButton,{time = 100, alpha = 0,onComplete =function() 

@@ -151,7 +151,7 @@ module(..., package.seeall)
 
     version - 1.0
     date - 2012.08.08
-    author comments - use it for free and enjoy. Please give me your feedback with a short mail!!!
+    author comments - use it for free and enjoy. Please give me your feedback with a short mail!!!{255/255, 51/255, 204/255}
 ]]--
 function onScreenKeyboard:new(params)
  local object = {
@@ -159,7 +159,7 @@ function onScreenKeyboard:new(params)
                    listener            = nil                                                            ,
                    displayGroup        = nil                                                            ,
                    parent              = nil                                                            ,
-                   btnBgColor          = {255/255, 51/255, 204/255}                                                  ,
+                   btnBgColor          = {176/255,176/255,176/255}                                              ,
                    btnBgAlpha          = 1                                                         ,
                    btnFgColor          = {1, 1, 1}                                                  ,
                    btnFontName         = "TeachersPet"                                                        ,
