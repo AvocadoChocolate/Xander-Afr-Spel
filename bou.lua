@@ -39,18 +39,19 @@ local wordsGroup = display.newGroup()
 local linesGroup = display.newGroup()
 local bouGroup = display.newGroup()
 local wordSound
+local goingHome = false
 local wordChannel
 local isPlaying = false
 local wordComplete = false
 local function gotoHome(event)
 	
 	print(isPlaying)
-	if(isPlaying)then
+	--if(isPlaying)then
 		audio.stop()
 		
 		isPlaying = false
-	end
-	if( wordComplete==false)then
+	--end
+	goingHome = true
 	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
 			transition.to(menuGroup,{time = 100, alpha = 1})
 			end})
@@ -61,7 +62,7 @@ local function gotoHome(event)
 	
 	end})
 	composer.gotoScene("menu",{time = 500,effect="fromBottom"}) 
-	end
+	
 	return true
 end
 
@@ -170,12 +171,17 @@ end
 local function Next()
 		
 		word = getNextWord()
-		isPlaying = true
+		audio.stop()
+		isPlaying = false
 		drawLines()
+		isPlaying = true
 		timer.performWithDelay(500,function()
-		wordSound = audio.loadSound( "sound/graad"..grade.."/"..word[1]..".mp3" )
-		wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
-		wordComplete = false
+			if(goingHome == false)then
+				
+				wordSound = audio.loadSound( "sound/graad"..grade.."/"..word[1]..".mp3" )
+				wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
+			
+			end
 		end)
 		--print(word)
 		
@@ -228,7 +234,7 @@ local function Next()
 					
 						
 						wordComplete = true
-						timer.performWithDelay(2500,function()
+						timer.performWithDelay(1000,function()
 						wordsGroup:removeSelf()
 						wordsGroup = nil
 						wordsGroup = display.newGroup()
@@ -282,7 +288,7 @@ local function Next()
 				
 					tick.alpha = 1
 					wordComplete = true
-					timer.performWithDelay(2500,function()
+					timer.performWithDelay(1000,function()
 					linesGroup:removeSelf()
 					linesGroup=nil
 					linesGroup = display.newGroup()
@@ -524,6 +530,7 @@ function scene:show( event )
         
         -- we obtain the object by id from the scene's object hierarchy
 		--math.randomseed( os.time() )
+		goingHome= false
 		if(xanderGroup.alpha==0)then
 			xanderGroup.alpha = 1
 			timer.performWithDelay(2000,function() transition.to(xanderGroup,{time = 500,alpha = 0})end)
