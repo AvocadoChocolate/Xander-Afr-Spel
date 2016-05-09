@@ -36,11 +36,10 @@ local goingHome = false
 local xanderGroup = display.newGroup()
 -----
 local function gotoHome(event)
-	--if(isPlaying)then
+	if(isPlaying)then
 		audio.stop()
-		
 		isPlaying = false
-	--end
+	end
 	goingHome = true
 	transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
 			transition.to(menuGroup,{time = 100, alpha = 1})
@@ -48,6 +47,7 @@ local function gotoHome(event)
 		transition.to(spelGroup,{time=500,y = 2*display.contentHeight,onComplete = function() 
 		transition.to(spelGroup,{time=500,y = 0})
 		end})
+		
 		composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
 		addAndSaveIncorrectWords(list)
 		playersList[cur].grade = grade
@@ -70,14 +70,7 @@ local function getNextWord()
 		check = false
 		r = math.random(grTotal)
 		word = gr3.getWord(r)
-		isPlaying = true
-		timer.performWithDelay(500,function()
-		if(goingHome ==false)then
 		
-		wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
-		wordChannel = audio.play( wordSound ,{onComplete=function() isPlaying = false end })
-		end
-		end)
 		
 		for i=1,#prevWords do
 			if word == prevWords[i] then
@@ -86,6 +79,16 @@ local function getNextWord()
 
 		end
 	end
+	audio.stop()
+	
+	isPlaying = true
+		timer.performWithDelay(500,function()
+		if(goingHome ==false)then
+		
+		wordSound = audio.loadSound( "sound/graad"..grade.."/"..word..".mp3" )
+		wordChannel = audio.play( wordSound ,{onComplete=function() isPlaying = false end })
+		end
+		end)
 	word = string.gsub( word, "%-","")
 	word = string.lower( word )
 	return word
