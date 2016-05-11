@@ -170,6 +170,7 @@ end
 
 local function Next()
 		
+		
 		word = getNextWord()
 		audio.stop()
 		isPlaying = false
@@ -177,9 +178,10 @@ local function Next()
 		isPlaying = true
 		timer.performWithDelay(500,function()
 			if(goingHome == false)then
-				
+	
 				wordSound = audio.loadSound( "sound/graad"..grade.."/"..word[1]..".mp3" )
-				wordChannel = audio.play( wordSound ,{onComplete= function() isPlaying = false end})
+				wordChannel = audio.play( wordSound ,{onComplete= function() 
+				isPlaying = false end})
 			
 			end
 		end)
@@ -232,7 +234,8 @@ local function Next()
 				if(collided)then
 					if(counter == #word -1)then
 					
-						
+						menuGroup:removeSelf()
+						menuGroup = nil
 						wordComplete = true
 						timer.performWithDelay(1000,function()
 						wordsGroup:removeSelf()
@@ -285,10 +288,9 @@ local function Next()
 					end
 				end
 				if(curPos == #word - 1)then
-				
 					tick.alpha = 1
 					wordComplete = true
-					timer.performWithDelay(1000,function()
+					timer.performWithDelay(400,function()
 					linesGroup:removeSelf()
 					linesGroup=nil
 					linesGroup = display.newGroup()
@@ -303,6 +305,7 @@ local function Next()
 					canvas ={}
 					--isPlaying = true
 					Next()
+					
 					--isPlaying = true
 					end)
 					
