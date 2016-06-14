@@ -21,7 +21,7 @@ local scene = composer.newScene( sceneName )
 local xInset,yInset = display.contentWidth / 20 , display.contentHeight / 20
 local word =""
 local cardText
-local swipeImg
+local swipeImg = nil
 local prevWords = {}
 local cardGroup = display.newGroup()
 local isSwipping = false
@@ -441,15 +441,18 @@ function scene:create( event )
 			transition.to(cardText,{time=500,alpha = 1})
 		end
 		transition.to(cardText,{time=500,alpha = 1})
+		
 		if(swipeImg==nil)then
+						
 						swipeImg = display.newImage("drag.png")
 						swipeImg:scale(xInset/swipeImg.contentWidth,xInset/swipeImg.contentWidth)
-						swipeImg.x = display.contentWidth / 2 - xInset * 2.5
-						swipeImg.y = display.contentHeight + yInset*2
+						swipeImg.x = display.contentWidth / 2 + xInset * 2.5
+						swipeImg.y = display.contentHeight - yInset*2
 						swipeImg.alpha = 0.4
 						flashGroup:insert(swipeImg)
 						
 						transition.to(swipeImg,{time=1000,delay=100,x = display.contentWidth / 2 - xInset * 2.5,alpha=1,onComplete=function()
+						
 						transition.to(swipeImg,{time=500,alpha=0})					
 
 						end})

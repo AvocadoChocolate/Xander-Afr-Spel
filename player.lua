@@ -106,10 +106,10 @@ function scene:show( event )
 				local grTotal
 				if(plaersList[row.index].grade == "1")then
 					gr3 = require("gr1")
-					grTotal = gr3.total()+53
+					grTotal = 50
 				else
 					gr3 = require("gr2")
-					grTotal = gr3.total()+50
+					grTotal = 50
 				end
 				 --+ math.round(gr3.total()/2)
 				
