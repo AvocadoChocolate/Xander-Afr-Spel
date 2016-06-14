@@ -6,8 +6,8 @@ if(grade == "1")then
 else
  gr3 = require("gr2")
 end
-local gr1Total = gr3.total() + 53
-local gr2Total = gr3.total() + 50
+local gr1Total = 50
+local gr2Total =50
 local grTotal = gr3.total()
 local scene = composer.newScene()
 local keyboard
@@ -96,6 +96,7 @@ end
 if(word==nil)then
  word = getNextWord()
 end
+
 --Developer mode
 local function developerMode()
 		local options = 
@@ -336,6 +337,15 @@ local function redrawKeyboard()
 								if(grade == "1")then
 									if(tonumber(correct)<=gr1Total)then
 									correct = correct + 1
+									local alreadyContainsWordpos = -1
+									for i=1,#list do
+										if(word==list[i])then
+											alreadyContainsWordpos = i
+										end
+									end
+									if(alreadyContainsWordpos~=-1)then
+										table.remove(list, alreadyContainsWordpos)
+									end
 									end
 									if(tonumber(correct)==gr1Total)then
 									----------------------------------------------------------------------------------------Graduate Grade 1

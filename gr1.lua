@@ -88,7 +88,7 @@ local words = {
 "luister",
 "lyne",
 "maak",
-"Maandag",
+--"Maandag",
 "maande",
 "mamma",
 "meisie",

@@ -42,6 +42,7 @@ local wordSound
 local goingHome = false
 local wordChannel
 local isPlaying = false
+local playersList = getPlayers()
 local wordComplete = false
 local function gotoHome(event)
 	
@@ -92,6 +93,7 @@ local function getNextWord()
 		prevWords = {}
 		prevWords[#prevWords+1]= syllable
 	end
+	print(syllable[1])
 	return syllable
 end
 
@@ -167,7 +169,241 @@ local function drawLines()
 	end
 	
 end
+local function graduate()
+	if(keyboard~=nil)then
+		keyboard:destroy()
+		keyboard = nil
+	end
+	local back = display.newRect(0,0,display.contentWidth,display.contentWidth)
+	back.anchorX = 0
+	back.anchorY = 0
+	back:setFillColor(0)
+	back.alpha = 0.4
+	back:toFront()
+	--back.isHitTestable = false
+	local function block(event)
+		return true
+	end
+	back:addEventListener("tap",block)
+	bouGroup:insert(back)
+	local xander = display.newImage("2-reverse.png")
+	xander.x = display.contentWidth  / 2 - xInset * 2.2
+	xander.y = display.contentHeight - yInset*12
+	xander:scale(xInset*2.5/xander.contentWidth,xInset*2.5/xander.contentWidth)
+	bouGroup:insert(xander)
+	local nextGrade =  tonumber(grade)+1
+	if(nextGrade<=7)then
+	local options = 
+	{
+		--parent = row,
+		text = "Veelsgeluk! Wil jy graad "..nextGrade.." doen?",     
+		--x = 0,
+		--y = 200,
+		width = 180,     --required for multi-line and alignment
+		font = "TeachersPet",   
+		fontSize = 28,
+		align = "left"  --new alignment parameter
+	}
+	
+	
+	confirmText = display.newText( options )
+	--confirmText.anchorX =0.5
+	--confirmText.anchorY =0
+	confirmText.alpha = 1
+	confirmText.x = display.contentWidth  / 2 + xInset * 3
+	confirmText.y = display.contentHeight - yInset*15 - 10
+	confirmText:setFillColor( 1, 1, 1 )
+	local speechBox = display.newImage("speechbox.png")
+	speechBox.x = display.contentWidth  / 2 + xInset * 3
+	speechBox.y = display.contentHeight - yInset*15
+	speechBox:scale((confirmText.width+20)/speechBox.contentWidth,(confirmText.height+25)/speechBox.contentHeight)
+	bouGroup:insert(speechBox)
+	bouGroup:insert(confirmText)
+	
+	local yes  = display.newRoundedRect(display.contentWidth / 2 - xInset*2 - 5,display.contentHeight - yInset*8,xInset*2,yInset*2,4)
+	yes.anchorX = 0.5
+	yes.anchorY = 0
+	--yes.strokeWidth = 2
+	yes:setFillColor( 255/255, 51/255, 204/255)
+	--yes:setStrokeColor( 255/255, 51/255, 204/255 )
+	bouGroup:insert(yes)
+	local no  = display.newRoundedRect(display.contentWidth / 2 + xInset*2 + 5,display.contentHeight - yInset*8,xInset*2,yInset*2,4)
+	no.anchorX = 0.5
+	no.anchorY = 0
+	--yes.strokeWidth = 2
+	no:setFillColor( 255/255, 51/255, 204/255)
+	--yes:setStrokeColor( 255/255, 51/255, 204/255 )
+	bouGroup:insert(no)
+	local options = 
+	{
+		--parent = row,
+		text = "JA",     
+		--x = 0,
+		--y = 200,
+		--width = 128,     --required for multi-line and alignment
+		font = "TeachersPet",   
+		fontSize = 28,
+		align = "right"  --new alignment parameter
+	}
 
+	yesText = display.newText( options )
+	yesText.anchorX =0.5
+	yesText.anchorY =0
+	yesText.alpha = 1
+	yesText.x = display.contentWidth / 2 -xInset*2 - 5
+	yesText.y = display.contentHeight - yInset*8+ 8
+	yesText:setFillColor( 1, 1, 1 )
+	bouGroup:insert(yesText)
+	local options = 
+	{
+		--parent = row,
+		text = "NEE",     
+		--x = 0,
+		--y = 200,
+		--width = 128,     --required for multi-line and alignment
+		font = "TeachersPet",   
+		fontSize = 28,
+		align = "right"  --new alignment parameter
+	}
+
+	noText = display.newText( options )
+	noText.anchorX =0.5
+	noText.anchorY =0
+	noText.alpha = 1
+	noText.x = display.contentWidth / 2 + xInset*2 + 5
+	noText.y = display.contentHeight - yInset*8 + 8
+	noText:setFillColor( 1, 1, 1 )
+	bouGroup:insert(noText)
+	local function cancel(event)
+		----------------------------------------------------------------------------------------------------Maak graduation op kies speler beskikbaar
+		
+		
+		back:removeSelf()
+		back=nil
+		confirmText:removeSelf()
+		confirmText = nil
+		yes:removeSelf()
+		yes = nil
+		no:removeSelf()
+		no = nil
+		yesText:removeSelf()
+		yesText = nil
+		noText:removeSelf()
+		noText = nil
+		xander:removeSelf()
+		xander = nil
+		speechBox:removeSelf()
+		speechBox=nil
+		
+		
+		return true
+	end
+	no:addEventListener("tap",cancel)
+	local function confirmed(event)
+		
+		grade = tonumber(grade) + 1
+		correct = 0
+		transition.to(menuGroup,{time = 100, alpha = 0,onComplete =function() 
+			transition.to(menuGroup,{time = 100, alpha = 1})
+			end})
+		transition.to(bouGroup,{time=500,y = 2*display.contentHeight,onComplete = function() 
+		transition.to(bouGroup,{time=500,y = 0})
+		end})
+		composer.removeScene("bou")
+		composer.gotoScene("menu",{time = 500,effect="fromTop"}) 
+		list ={}
+		addAndSaveIncorrectWords(list)
+		
+		playersList[cur].grade = grade
+		playersList[cur].correct = correct
+		playersList[cur].incorrect = 0
+		addAndSavePlayers(playersList)
+		if(keyboard~=nil)then
+			keyboard:destroy()
+			keyboard = nil
+		end
+		return true
+	end
+	
+	yes:addEventListener("tap",confirmed)
+	else
+		local options = 
+		{
+			--parent = row,
+			text = "Veelsgeluk! Kry ons Graad 8 - 12 Spelling App",     
+			--x = 0,
+			--y = 200,
+			width = 180,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 28,
+			align = "left"  --new alignment parameter
+		}
+		
+		
+		confirmText = display.newText( options )
+		--confirmText.anchorX =0.5
+		--confirmText.anchorY =0
+		confirmText.alpha = 1
+		confirmText.x = display.contentWidth  / 2 + xInset * 3
+		confirmText.y = display.contentHeight - yInset*15 - 10
+		confirmText:setFillColor( 1, 1, 1 )
+		local speechBox = display.newImage("speechbox.png")
+		speechBox.x = display.contentWidth  / 2 + xInset * 3
+		speechBox.y = display.contentHeight - yInset*15
+		speechBox:scale((confirmText.width+20)/speechBox.contentWidth,(confirmText.height+25)/speechBox.contentHeight)
+		bouGroup:insert(speechBox)
+		bouGroup:insert(confirmText)
+		local no  = display.newRoundedRect(display.contentWidth / 2 ,display.contentHeight - yInset*8,xInset*2,yInset*2,4)
+		no.anchorX = 0.5
+		no.anchorY = 0
+		--yes.strokeWidth = 2
+		no:setFillColor( 255/255, 51/255, 204/255)
+		--yes:setStrokeColor( 255/255, 51/255, 204/255 )
+		bouGroup:insert(no)
+		local options = 
+		{
+			--parent = row,
+			text = "OK",     
+			--x = 0,
+			--y = 200,
+			--width = 128,     --required for multi-line and alignment
+			font = "TeachersPet",   
+			fontSize = 28,
+			align = "right"  --new alignment parameter
+		}
+
+		noText = display.newText( options )
+		noText.anchorX =0.5
+		noText.anchorY =0
+		noText.alpha = 1
+		noText.x = display.contentWidth / 2 
+		noText.y = display.contentHeight - yInset*8 + 8
+		noText:setFillColor( 1, 1, 1 )
+		bouGroup:insert(noText)
+		local function cancel(event)
+			----------------------------------------------------------------------------------------------------Maak graduation op kies speler beskikbaar
+			
+			
+			back:removeSelf()
+			back=nil
+			confirmText:removeSelf()
+			confirmText = nil
+			no:removeSelf()
+			no = nil
+			
+			noText:removeSelf()
+			noText = nil
+			xander:removeSelf()
+			xander = nil
+			speechBox:removeSelf()
+			speechBox=nil
+			
+			
+			return true
+		end
+		no:addEventListener("tap",cancel)
+	end
+end
 local function Next()
 		
 		
@@ -189,82 +425,201 @@ local function Next()
 		
 		
 		local function drag( event )
-			if event.phase == "began" then
+				if event.phase == "began" then
 				collided = false
+				began = true
 				markX = event.target.x    -- store x location of object
 				markY = event.target.y    -- store y location of object
-				
-				display.getCurrentStage():setFocus( event.target )
-			elseif event.phase == "moved" then
-			
-				local x = (event.x - event.xStart) + markX
-				local y = (event.y - event.yStart) + markY
-				
-				event.target.x, event.target.y = x, y    -- move object based on calculations above
-			elseif event.phase == "ended" or event.phase == "cancelled" then
-				event.target.alpha = 1
-				
-				
-				--print(event.target.pos)
-				if(event.target.pos~= nil)then
-					for i=1,#pieces do
-						if(hasCollided(event.target,pieces[i]))then
-							print("moving piece  "..event.target.piece)
-							print("static piece  "..pieces[i].piece)
-							if(event.target.piece == pieces[i].piece)then
-								event.target.alpha = 0
-								for j=pieces[i].spos,pieces[i].epos do
-									tospell[j].alpha =1
+				lookingFor = ""
+				for i=1,#tospell do
+					if(tospell[i].pos==counter)then
+						lookingFor = lookingFor..tospell[i].text
+					end
+				end
+				if(developerMode)then
+				-------------------------------------------------------------------------------------------------------------------------------Determin correct drop area bounds
+					for d = 1,#pieces do
+						local yPos = linesGroup.y -yInset*1.5-- tospell[1].y
+						local xPos = 0
+						local stX = nil
+						for i=1,#tospell do
+								if(d==tospell[i].pos)then
+									xPos = xPos + tospell[i].contentWidth + xInset/2
+									if(stX == nil)then
+										stX = linesGroup.x - (linesGroup.contentWidth / 2) + tospell[i].x - xInset/4
+									end
 								end
-								collided = true
+						end
+						xPos = xPos + xInset
+						-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+						-- print(" event.target.x" .. (event.x ))
+						-- print(" event.target.y" .. event.y)
+						-- print("stX :"..stX)
+						-- print("stX + xPos = "..(stX + xPos))
+						-- print(" event.target.x" .. event.target.x)
+						-- print("yPos :"..yPos)
+						-- print("xPos :"..xPos)
+						-- print(lookingFor)
+						local myRectangle = display.newRect(stX,yPos + yInset*2 ,xPos,yInset*4)
+						myRectangle.strokeWidth = 3
+						myRectangle:setFillColor( 0.5,0 )
+						myRectangle:setStrokeColor( 1, 0, 0 )
+						myRectangle:toFront()
+						bouGroup:insert(myRectangle)
+					end
+				end
+					display.getCurrentStage():setFocus( event.target )
+				elseif event.phase == "moved" then
+				
+					if(began)then
+					local x = (event.x - event.xStart) + markX
+					local y = (event.y - event.yStart) + markY
+					
+					event.target.x, event.target.y = x, y    -- move object based on calculations above
+					end
+				elseif event.phase == "ended" or event.phase == "cancelled" then
+					event.target.alpha = 1
+					began = false
+					-------------------------------------------------------------------------------------------------------------------------------Determin correct drop area bounds
+					local yPos = linesGroup.y -yInset*1.5 --+ tospell[1].y
+					local xPos = 0
+					local stX = nil
+					local pLen = 0
+					for i=1,#tospell do
+							if(counter==tospell[i].pos)then
+								xPos = xPos + tospell[i].contentWidth + xInset/2
+								pLen = pLen + 1
+								if(stX == nil)then
+									stX = linesGroup.x - (linesGroup.contentWidth / 2) + tospell[i].x - xInset/4
+								end
+							end
+					end
+					if(pLen == 1)then
+						stX = stX - xInset/4
+					end
+					xPos = xPos + xInset
+					-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+					-- print(" event.target.x" .. (event.x ))
+					-- print(" event.target.y" .. event.y)
+					-- print("stX :"..stX)
+					-- print("stX + xPos = "..(stX + xPos))
+					-- print(" event.target.x" .. event.target.x)
+					-- print("yPos :"..yPos)
+					-- print("xPos :"..xPos)
+					-- print(lookingFor)
+					-- local myRectangle = display.newRect(stX,yPos + yInset*2 ,xPos,yInset*4)
+					-- myRectangle.strokeWidth = 3
+					-- myRectangle:setFillColor( 0.5,0 )
+					-- myRectangle:setStrokeColor( 1, 0, 0 )
+					-- myRectangle:toFront()
+					-- bouGroup:insert(myRectangle)
+					local bool =  event.x < stX + xPos and event.x > stX - xInset/2 and event.y > yPos + yInset and event.y < yPos + yInset*5 
+					print(bool)
+					if( bool) then
+					-- if(event.target.pos~= nil)then
+						-- if(hasCollided(event.target,event.target.rectangle))then
+							-- event.target.alpha = 0
+							-- tospell[event.target.pos].alpha = 1
+							-- collided = true
+					
+						-- end
+					
+						
+					-- end
+					if(lookingFor == event.target.t)then
+						event.target.alpha = 0
+						for i=1,#tospell do
+							if(counter==tospell[i].pos)then
+								tospell[i].alpha = 1
 							end
 						end
-					end
-				
-					
-				end
-				if(event.x > xInset*15 or event.x < xInset * 5)then
-						transition.to(event.target,{time = 500,x=markX,y=markY})
-					
-				elseif(event.y>yInset*15 or event.y < yInset)then
-						transition.to(event.target,{time = 500,x=markX,y=markY})
-				end
-				display.getCurrentStage():setFocus(nil)
-				
-				if(collided)then
-					if(counter == #word -1)then
-					
-						menuGroup:removeSelf()
-						menuGroup = nil
-						wordComplete = true
-						timer.performWithDelay(1000,function()
-						wordsGroup:removeSelf()
-						wordsGroup = nil
-						wordsGroup = display.newGroup()
-						bouGroup:insert(wordsGroup)
-						pieces = {}
-						tospell = {}
-						canvas ={}
-						linesGroup:removeSelf()
-						linesGroup = nil
-						linesGroup = display.newGroup()
-						bouGroup:insert(linesGroup)
-						--isPlaying = true
-						Next()
-						--isPlaying = true
-						end)
+						if(counter == #pieces)then
 						
-						
-						counter = 1
+							tick.alpha = 1
+							wordComplete = true
+							timer.performWithDelay(300,function()
+							linesGroup:removeSelf()
+							linesGroup=nil
+							linesGroup = display.newGroup()
+							wordsGroup:removeSelf()
+							wordsGroup = nil
+							wordsGroup = display.newGroup()
+							bouGroup:insert(wordsGroup)
+							bouGroup:insert(linesGroup)
+							pieces = {}
+							mpieces ={}
+							tospell = {}
+							canvas ={}
+							--Confirm grade is less then 7
+							if(tonumber(grade) < 7)then
+								--Can add to score
+								if(tonumber(correct)<=50)then
+									if(firstCorrect)then
+									correct = correct + 1
+									end
+									--isPlaying = true
+									firstCorrect = true
+								end
+								--Score has been reached can graduate
+								if(tonumber(correct)==50)then
+									graduate()
+								
+								
+								end
+								--User has chose to continue on this level
+								if(tonumber(correct)>50)then
+										correct = 50
+								end
+							else
+								--Can add to score
+								if(tonumber(correct)<=50)then
+									if(firstCorrect)then
+										correct = correct + 1
+									end
+									--isPlaying = true
+									firstCorrect = true
+								end
+								--Score has been reached can graduate
+								if(tonumber(correct)==50)then
+									graduate()
+								end
+								--User has chose to continue on this level
+								if(tonumber(correct)>50)then
+										correct = 50
+								end
+							end
+							
+							Next()
+							--isPlaying = true
+							end)
+							
+							
+							counter = 1
+						else
+							counter = counter + 1
+						end
 					else
-						counter = counter + 1
+						firstCorrect = false
+						transition.to(event.target,{time = 500,x=markX,y=markY})
+						-- sX = event.target.x
+						-- transition.to(event.target,{time =120 ,rotation= 1,x =  sX + 0.1,iterations = 3,onRepeat =function() 
+							-- transition.to(event.target,{time =120 ,rotation = -1,x= sX - 0.10})
+						-- end,onComplete =function() transition.to(event.target,{time =6,rotation = 0 ,x=sX}) end})
 					end
-				
+				else
+					transition.to(event.target,{time = 500,x=markX,y=markY})
 				end
+					if(event.x > xInset*18 or event.x < xInset * 2)then
+							transition.to(event.target,{time = 500,x=markX,y=markY})
+						
+					elseif(event.y>yInset*15 or event.y < yInset)then
+							transition.to(event.target,{time = 500,x=markX,y=markY})
+					end
+					display.getCurrentStage():setFocus(nil)
+				end
+				
+				return true
 			end
-			
-			return true
-		end
 		
 		
 		local function myTap(event)
@@ -328,8 +683,10 @@ local function Next()
 		local prevX = 0
 		local c = 0
 		local q = 1
+		
 		for i=2,#word do
 			local pieceGroup = display.newGroup()
+			local FS = 46
 			local options = 
 			{
 				--parent = textGroup,
@@ -338,7 +695,7 @@ local function Next()
 				--y = 200,
 				--width = 128,     --required for multi-line and alignment
 				font = "TeachersPet",   
-				fontSize = 48,
+				fontSize = FS,
 				align = "right"  --new alignment parameter
 			}
 
@@ -347,9 +704,36 @@ local function Next()
 			myText.anchorY =0
 			myText.alpha = 1
 			myText:setFillColor( 0, 0, 0 )
+			
 			local canvasCollided = false
+			local falseCount = 0
 			while  canvasCollided==false do
 				canvasCollided = true
+				if(falseCount > 50)then
+					print("-----------------------------------")
+					falseCount = 0
+					tick.alpha = 1
+					wordComplete = true
+					myText:removeSelf()
+					linesGroup:removeSelf()
+					linesGroup=nil
+					linesGroup = display.newGroup()
+					wordsGroup:removeSelf()
+					wordsGroup = nil
+					wordsGroup = display.newGroup()
+					bouGroup:insert(wordsGroup)
+					bouGroup:insert(linesGroup)
+					pieceGroup:removeSelf()
+					pieceGroup=nil
+					pieces = {}
+					mpieces ={}
+					tospell = {}
+					canvas ={}
+					--isPlaying = true
+					Next()
+					return
+					
+				end
 				local xPos = math.random(4)
 				local yPos =  math.random(4)
 				myText.x =xInset*xPos*3 + xInset
@@ -362,9 +746,16 @@ local function Next()
 					if(hasCollided(rect,canvas[l]))then
 						
 						canvasCollided = false
+						falseCount = falseCount + 1
+						
+						print(canvasCollided)
 					end
 				end
+				if(canvasCollided)then
+					falseCount = 0
+				end
 				rect:removeSelf()
+				
 			end
 			if(c<5)then
 				c=c+1
@@ -436,7 +827,7 @@ local function Next()
 			
 			wordsGroup:insert(pieceGroup)
 			
-			pieceGroup:addEventListener( "tap", myTap )
+			pieceGroup:addEventListener( "touch", drag )
 		end
 		
 end

@@ -220,6 +220,7 @@ function scene:show( event )
 			linesGroup.x = xInset*9
 			local function spel(event)
 				word = w
+				composer.removeScene("spel")
 				composer.gotoScene("spel")
 				return true
 			end

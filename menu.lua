@@ -440,7 +440,7 @@ function scene:create( event )
 			local Scoreoptions = 
 			{
 				--parent = textGroup,
-				text = "Punt:     "..correct.." / ".."100",     
+				text = "Punt:     "..correct.." / ".."50",     
 				--x = 0,
 				--y = 200,
 				--width = 62,     --required for multi-line and alignment
@@ -488,7 +488,7 @@ function scene:show( event )
 		if(player~="")then
 			nameText.text =  "Naam:  "..player
 			gradeText.text = "Graad:  "..grade
-			scoreText.text = "Punt:     "..correct .. " / ".."100"
+			scoreText.text = "Punt:     "..correct .. " / ".."50"
 		end
     end 
 end

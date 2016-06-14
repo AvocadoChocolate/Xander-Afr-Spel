@@ -151,7 +151,7 @@ module(..., package.seeall)
 
     version - 1.0
     date - 2012.08.08
-    author comments - use it for free and enjoy. Please give me your feedback with a short mail!!!{255/255, 51/255, 204/255}
+    author comments - use it for free and enjoy. Please give me your feedback with a short mail!!!
 ]]--
 function onScreenKeyboard:new(params)
  local object = {
@@ -159,7 +159,7 @@ function onScreenKeyboard:new(params)
                    listener            = nil                                                            ,
                    displayGroup        = nil                                                            ,
                    parent              = nil                                                            ,
-                   btnBgColor          = {176/255,176/255,176/255}                                              ,
+                   btnBgColor          = {176/255,176/255,176/255}                                                  ,
                    btnBgAlpha          = 1                                                         ,
                    btnFgColor          = {1, 1, 1}                                                  ,
                    btnFontName         = "TeachersPet"                                                        ,
@@ -355,12 +355,13 @@ function onScreenKeyboard:new(params)
    backGround.x = backGround.contentWidth / 2
    backGround.y = backGround.contentHeight / 2
    local eo = self.enableOnly
-   
+  
    backGround:setFillColor(0.8)
    buttonGroup:insert(backGround)
    local buttonValue ={}
    buttonValue.backGround = backGround
    buttonValue.sign = sign:upper()
+ 
    --print(#self.buttons)
    
    
@@ -374,6 +375,9 @@ function onScreenKeyboard:new(params)
 				--buttonGroup.alpha = 1
   			end
 		end
+	elseif(sign =="OK")then
+				backGround:setFillColor(255/255, 51/255, 204/255)
+				buttonGroup:addEventListener("touch", touchAnimation)
 	else
 				backGround:setFillColor(self.btnBgColor[1], self.btnBgColor[2], self.btnBgColor[3])
 				buttonGroup:addEventListener("touch", touchAnimation)
@@ -414,6 +418,8 @@ function onScreenKeyboard:new(params)
 	   btnText.y = initY + backGround.height/2
 	   btnText:scale(0.3,0.3)
 	   buttonGroup:insert(btnText)
+   
+  
 	end
   
 
@@ -424,6 +430,7 @@ function onScreenKeyboard:new(params)
    buttonValue.group = buttonGroup
    --buttonGroup:setReferencePoint(display.topLeftReferencePoint)
 	self.buttons[#self.buttons+1] = buttonValue
+	 
    return buttonGroup
  end
 
@@ -548,7 +555,7 @@ function onScreenKeyboard:new(params)
 		   if eo ~= nil then
 				for letters = 1, #eo do
 					
-					if (currentItem:upper() == eo[letters]:upper()) then
+					if(currentItem:upper() == eo[letters]:upper()) then
 						
 						btnGroup:addEventListener("touch", self.userListenerCaller)
 						
