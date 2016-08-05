@@ -356,7 +356,7 @@ function onScreenKeyboard:new(params)
    backGround.y = backGround.contentHeight / 2
    local eo = self.enableOnly
   
-   backGround:setFillColor(0.8)
+   backGround:setFillColor(0.9)
    buttonGroup:insert(backGround)
    local buttonValue ={}
    buttonValue.backGround = backGround
